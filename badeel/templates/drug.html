@@ -34,6 +34,23 @@
     {{ _('This product and all its alternatives contain %s, which is on your allergy list.', 'هذا الدواء وكل بدائله تحتوي %s وهي مسجلة في قائمة الحساسية عندك.') | format(allergy_hits | join(', ')) }}
   </div>
   {% endif %}
+  {% if saved_interactions %}
+  <div class="alert danger" role="alert" id="interactions">
+    <strong>{{ _('Interaction warning', 'تحذير تداخل دوائي') }}</strong>
+    {{ _('This product may interact with medicines you saved:', 'هذا الدواء قد يتداخل مع أدوية محفوظة عندك:') }}
+    <ul class="interaction-list">
+      {% for w in saved_interactions %}
+      <li><a href="{{ url_for('public.drug', drug_id=w.drug.id) }}" dir="ltr">{{ w.drug.trade_name }}</a>:
+        {% for i in w.interactions %}<span class="sev sev-{{ i.severity }}">{{ _(*severity_labels[i.severity]) }}</span>
+        <span dir="ltr">{{ display_name(i.own) }} + {{ display_name(i.other) }}</span>{{ '، ' if lang == 'ar' and not loop.last else (', ' if not loop.last) }}{% endfor %}
+      </li>
+      {% endfor %}
+    </ul>
+    <small>{{ _('Source: DDInter. Ask your pharmacist or doctor before taking them together.', 'المصدر: DDInter. اسأل الصيدلي أو الطبيب قبل استخدامهم مع بعض.') }}</small>
+  </div>
+  {% elif interaction_count and not user %}
+  <p class="muted">{{ _('%s known interactions are recorded for this ingredient. Log in and save your medicines to be warned about them.', 'يوجد %s تداخل دوائي مسجل لهذه المادة. سجل الدخول واحفظ أدويتك ليظهر لك تحذير.') | format(interaction_count) }}</p>
+  {% endif %}
   {% if not d.strength_known %}
   <div class="alert warn">{{ _('The strength of this product is not recorded, so no product can be confirmed as an exact alternative.', 'تركيز هذا الدواء غير مسجل، لذلك لا يمكن تأكيد أي بديل مطابق له.') }}</div>
   {% endif %}
@@ -61,6 +78,37 @@
     <h2 id="h-class">{{ _('Different medicine from the same class', 'دواء مختلف من نفس المجموعة العلاجية') }}</h2>
     <div class="alert warn">{{ _('A different active ingredient. Only a doctor can switch you to one of these.', 'مادة فعالة مختلفة. الطبيب فقط هو من يقرر التحويل إلى أحدها.') }}</div>
     <ul class="rows compact">{% for a in alt.same_class %}{{ drug_row(a, d) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  {% if leaflet %}
+  <section class="block leaflet" aria-labelledby="h-leaflet">
+    <h2 id="h-leaflet">{{ _('Package leaflet information', 'معلومات من النشرة الداخلية') }}</h2>
+    <div class="alert warn">
+      {{ _('From a U.S. leaflet for the same active ingredients, in English. It may differ from the Egyptian leaflet. For information only: Badeel does not choose doses. Ask your pharmacist or doctor.', 'من نشرة أمريكية لنفس المادة الفعالة، باللغة الإنجليزية، وقد تختلف عن النشرة المصرية. للمعلومة فقط: بديل لا يحدد الجرعات. اسأل الصيدلي أو الطبيب.') }}
+    </div>
+    {% if leaflet.pediatric_note == 'min_age' %}
+    <p class="alert warn"><strong>{{ _('Children:', 'الأطفال:') }}</strong>
+      {% if leaflet.min_age_months >= 24 and leaflet.min_age_months % 12 == 0 %}
+        {{ _('the leaflet does not establish use below %s years of age.', 'النشرة لا تثبت الاستخدام تحت سن %s سنة.') | format(leaflet.min_age_months // 12) }}
+      {% else %}
+        {{ _('the leaflet does not establish use below %s months of age.', 'النشرة لا تثبت الاستخدام تحت سن %s شهر.') | format(leaflet.min_age_months) }}
+      {% endif %}
+    </p>
+    {% elif leaflet.pediatric_note == 'not_established' %}
+    <p class="alert warn"><strong>{{ _('Children:', 'الأطفال:') }}</strong>
+      {{ _('the leaflet says safety and effectiveness in children have not been established.', 'النشرة تقول إن الأمان والفعالية للأطفال غير مثبتين.') }}</p>
+    {% endif %}
+    {% for key, en, ar in leaflet_sections %}{% if leaflet[key] %}
+    <details{{ ' open' if key == 'indications' }}>
+      <summary>{{ _(en, ar) }}</summary>
+      <p dir="ltr" lang="en" class="leaflet-text">{{ leaflet[key] }}</p>
+    </details>
+    {% endif %}{% endfor %}
+    <p class="muted"><small>
+      {{ _('Source: openFDA drug labels', 'المصدر: openFDA drug labels') }}{% if leaflet.brand_name %} ({{ leaflet.brand_name }}){% endif %}{% if leaflet.effective_date %}, {{ leaflet.effective_date }}{% endif %}.
+      {% if leaflet.set_id %}<a href="https://dailymed.nlm.nih.gov/dailymed/lookup.cfm?setid={{ leaflet.set_id | urlencode }}" rel="noopener" target="_blank">{{ _('Full leaflet on DailyMed', 'النشرة كاملة على DailyMed') }}</a>{% endif %}
+    </small></p>
   </section>
   {% endif %}
 

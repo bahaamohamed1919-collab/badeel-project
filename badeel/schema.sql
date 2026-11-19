@@ -103,3 +103,39 @@ CREATE TABLE IF NOT EXISTS settings (
     key     TEXT PRIMARY KEY,
     value   TEXT
 );
+
+-- ------------------------------------------------------------------------
+-- Data added from outside sources (python manage.py collect-data).
+-- Ingredients are stored as "moiety" names (normalize.moiety_key) so the
+-- rows stay valid when the drug list is re-imported.
+
+-- Drug-drug interactions, one row per pair (ingredient_a < ingredient_b).
+CREATE TABLE IF NOT EXISTS drug_interactions (
+    ingredient_a    TEXT NOT NULL,
+    ingredient_b    TEXT NOT NULL,
+    severity        TEXT NOT NULL CHECK (severity IN ('major', 'moderate', 'minor', 'unknown')),
+    source          TEXT NOT NULL,
+    PRIMARY KEY (ingredient_a, ingredient_b)
+);
+CREATE INDEX IF NOT EXISTS idx_interactions_b ON drug_interactions (ingredient_b);
+
+-- One package leaflet per set of ingredients (from openFDA drug labels).
+CREATE TABLE IF NOT EXISTS ingredient_labels (
+    ingredient_key      TEXT PRIMARY KEY,    -- moiety names sorted, joined by "|"
+    source              TEXT NOT NULL,
+    label_id            TEXT,
+    set_id              TEXT,                -- opens the leaflet on DailyMed
+    effective_date      TEXT,
+    brand_name          TEXT,
+    indications         TEXT,
+    dosage              TEXT,
+    pediatric           TEXT,
+    geriatric           TEXT,
+    pregnancy           TEXT,
+    lactation           TEXT,
+    contraindications   TEXT,
+    warnings            TEXT,
+    boxed_warning       TEXT,
+    pediatric_note      TEXT,                -- 'not_established' | 'min_age' | NULL
+    min_age_months      INTEGER
+);

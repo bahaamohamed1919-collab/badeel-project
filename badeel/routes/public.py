@@ -3,7 +3,7 @@ from flask import (Blueprint, abort, g, jsonify, redirect, render_template, requ
                    session, url_for)
 
 from .. import db, security
-from ..services import recommender, search as search_service
+from ..services import interactions, labels, recommender, search as search_service
 from ..services.normalize import canon_ingredient, display_name
 
 bp = Blueprint("public", __name__)
@@ -86,10 +86,13 @@ def drug(drug_id):
     allergy_hits = sorted(user_allergies() & set(d["ingredient_key"].split("|")))
     is_favorite = bool(g.user and db.one(
         "SELECT 1 FROM favorites WHERE user_id = ? AND drug_id = ?", (g.user["id"], drug_id)))
+    saved_interactions = interactions.with_saved_medicines(d, g.user["id"]) if g.user else []
     return render_template(
         "drug.html", d=d, alt=alternatives, ingredients=ingredients,
         allergy_hits=[display_name(a) for a in allergy_hits], is_favorite=is_favorite,
-        display_name=display_name)
+        display_name=display_name, leaflet=labels.for_drug(d),
+        leaflet_sections=labels.SECTION_LABELS, saved_interactions=saved_interactions,
+        interaction_count=interactions.count_for(d), severity_labels=interactions.SEVERITY_LABELS)
 
 
 @bp.route("/ingredient/<int:ingredient_id>")

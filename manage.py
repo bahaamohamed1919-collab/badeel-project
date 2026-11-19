@@ -10,6 +10,11 @@
     python manage.py audit-sample         print random products to check strength/form by hand
     python manage.py import-csv FILE      import drugs from a CSV file
     python manage.py import-csv FILE --replace    delete current drugs first
+    python manage.py collect-data         download DDInter + openFDA leaflets and load them
+    python manage.py collect-data --source ddinter    only one source (ddinter | labels)
+    python manage.py load-interactions FILE...        load DDInter CSV files downloaded by hand
+    python manage.py load-labels FILE...              load openFDA label files downloaded by hand
+    python manage.py enrichment-report    coverage numbers (saved in docs/results/)
 """
 import argparse
 import getpass
@@ -20,7 +25,7 @@ import sys
 from flask import current_app
 
 from badeel import create_app, db, security
-from badeel.services import importer, ranker, search
+from badeel.services import coverage, importer, interactions, labels, ranker, search, sources
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -194,6 +199,45 @@ def cmd_import(args):
         print(f"  line {line} ({name}): {error}")
 
 
+def _load_interactions(paths):
+    r = interactions.load_ddinter(paths)
+    print(f"DDInter: {r['rows_read']:,} rows read, {r['pairs']:,} interaction pairs stored.")
+
+
+def _load_labels(paths):
+    r = labels.load_openfda(paths)
+    print(f"openFDA: {r['leaflets_read']:,} leaflets read, "
+          f"{r['ingredient_sets']:,} ingredient sets of the drug list have a leaflet.")
+
+
+def cmd_collect_data(args):
+    """Download the outside sources into data/raw/ and load them."""
+    if args.source in ("all", "ddinter"):
+        print("DDInter (drug-drug interactions)")
+        _load_interactions(sources.fetch_ddinter())
+    if args.source in ("all", "labels"):
+        print("openFDA drug labels (package leaflets). About 13 large files: this takes a while.")
+        _load_labels(sources.fetch_openfda_labels())
+    cmd_enrichment_report(args)
+
+
+def cmd_load_interactions(args):
+    _load_interactions(args.files)
+
+
+def cmd_load_labels(args):
+    _load_labels(args.files)
+
+
+def cmd_enrichment_report(_args):
+    text = coverage.as_text(coverage.report())
+    print("\n" + text)
+    out = os.path.join(ROOT, "docs", "results", "enrichment_report.txt")
+    with open(out, "w", encoding="utf-8") as f:
+        f.write(text + "\n")
+    print(f"\nSaved to {os.path.relpath(out, ROOT)}")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Badeel management commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -217,6 +261,16 @@ def main():
     p.add_argument("file")
     p.add_argument("--replace", action="store_true")
     p.set_defaults(func=cmd_import)
+    p = sub.add_parser("collect-data")
+    p.add_argument("--source", choices=["all", "ddinter", "labels"], default="all")
+    p.set_defaults(func=cmd_collect_data)
+    p = sub.add_parser("load-interactions")
+    p.add_argument("files", nargs="+")
+    p.set_defaults(func=cmd_load_interactions)
+    p = sub.add_parser("load-labels")
+    p.add_argument("files", nargs="+")
+    p.set_defaults(func=cmd_load_labels)
+    sub.add_parser("enrichment-report").set_defaults(func=cmd_enrichment_report)
     args = parser.parse_args()
 
     app = create_app()
