@@ -1,0 +1,24 @@
+1) SEARCH WITH SPELLING MISTAKES  (live website search, with the trained model)
+   drugs in database        : 59
+   misspelled queries tested: 292
+   Top-1 accuracy           : 99.7%
+   Top-3 accuracy           : 100.0%
+   MRR                      : 0.998
+   Baseline SQL LIKE found  : 0.0%
+   Average time per query   : 1.8 ms (includes the baseline query)
+   (in-sample: the model was trained on these same names, so 1b is the fair test)
+
+1b) TRAINED RANKING MODEL  (grouped 5-fold cross-validation, unseen brands)
+   generated queries        : 2118
+   Top-1 without model      : 95.5%
+   Top-1 with model         : 97.1%  (+/- 1.4%)
+   Top-3 / MRR with model   : 99.8% / 0.984
+   Details per kind of mistake: python ml/train.py
+
+2) ALTERNATIVE MATCHING AGAINST HAND-LABELLED PAIRS
+   labelled pairs evaluated : 40  (not found in database: 0)
+   TP=25  FP=0  TN=15  FN=0
+   Accuracy : 100.0%
+   Precision: 100.0%   (FP = a wrong drug recommended)
+   Recall   : 100.0%   (FN = a valid alternative missed)
+   F1-score : 1.000

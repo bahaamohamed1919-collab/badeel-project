@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "_macros.html" import strip, drug_row, drug_name, availability with context %}
+{% block title %}{{ _('Saved medicines', 'الأدوية المحفوظة') }}{% endblock %}
+{% block content %}
+<h1 class="page-h">{{ _('Saved medicines', 'الأدوية المحفوظة') }}</h1>
+{% if drugs %}
+<ul class="rows">{% for d in drugs %}{{ drug_row(d) }}{% endfor %}</ul>
+{% else %}
+<section class="empty">
+  <p>{{ _('Nothing saved yet. Open a medicine you take regularly and choose “Save this medicine”.', 'لا توجد أدوية محفوظة. افتح دواء تستخدمه باستمرار واختر «حفظ هذا الدواء».') }}</p>
+  <p><a class="btn" href="{{ url_for('public.home') }}">{{ _('Search for a medicine', 'ابحث عن دواء') }}</a></p>
+</section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+// Data preprocessing pipeline for an imported CSV file
+digraph preprocessing {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=13, nodesep=0.3, ranksep=0.32, pad=0.3, dpi=200];
+  node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", fillcolor=white, color="#1b2540", penwidth=1.3, margin="0.18,0.08", width=4.6];
+  edge  [fontname="DejaVu Sans", fontsize=10.5, color="#1b2540", arrowsize=0.8];
+  f  [label="CSV file (UTF-8), uploaded by the admin or via manage.py", shape=note];
+  h  [label="1. Map column headers to fields\n(e.g. commercial_name_en -> trade_name, price_egp -> price)"];
+  v  [label="2. Validate each row: name present, ingredients present,\nprice is a positive number, availability understood"];
+  c  [label="3. Split ingredients on '+', drop text in brackets,\napply aliases (acetaminophen -> paracetamol), drop HCl"];
+  s  [label="4. Find the strength: next to the ingredient, in a strength column,\nor inside the trade name (100MG, 160/12.5MG, 250MG/5ML)"];
+  u  [label="5. Convert units: g, mcg -> mg;  mg per 5 ml -> mg per ml"];
+  d  [label="6. Find the dosage form: form column, else words in the trade name\n(F.C.TABS, SUSP., VIAL), else route; mark extended / delayed release"];
+  k  [label="7. Build comparison keys\ningredient_key = sorted ingredients;  composition_key = ingredients + strengths"];
+  q  [label="8. Matchable only if every strength and the form are known", fillcolor="#e2f3eb", color="#0b7a56"];
+  w  [label="9. Save to drugs, ingredients, drug_ingredients\n(insert new, update existing)", shape=cylinder, width=3.5];
+  r  [label="Skipped rows report:\nline number, name, reason", shape=note, fillcolor="#fbe5e2", color="#a8322a"];
+  f -> h -> v -> c -> s -> u -> d -> k -> q -> w;
+  v -> r [label=" invalid row", color="#a8322a", fontcolor="#a8322a"];
+}

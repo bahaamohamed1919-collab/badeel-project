@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}{{ _('How it works', 'كيف يعمل') }}{% endblock %}
+{% block content %}
+<article class="prose">
+  <h1>{{ _('How Badeel decides what is an alternative', 'كيف يحدد بديل ما هو البديل') }}</h1>
+
+  <h2>{{ _('Exact alternatives', 'البدائل المطابقة') }}</h2>
+  <p>{{ _('Two products are exact alternatives only when all three of these are identical: every active ingredient, the strength of each ingredient, and the pharmaceutical form. Tablets are never matched with syrup, 500 mg is never matched with 1 g, and an extended-release tablet is never matched with a normal one.', 'يعتبر الدواءان بديلين مطابقين فقط إذا تطابقت ثلاثة أشياء: كل المواد الفعالة، وتركيز كل مادة، والشكل الدوائي. الأقراص لا تطابق الشراب، و500 مجم لا تطابق 1 جم، والأقراص ممتدة المفعول لا تطابق الأقراص العادية.') }}</p>
+
+  <h2>{{ _('Why the rule is strict', 'لماذا القاعدة صارمة') }}</h2>
+  <p>{{ _('A wrong suggestion can harm someone. So the decision “these two are the same” is made by a fixed rule that can be checked, not by a model that estimates. Units are converted first, so 0.5 g and 500 mg count as the same strength.', 'الاقتراح الخاطئ قد يؤذي المريض. لذلك قرار «هذان الدواءان متطابقان» تأخذه قاعدة ثابتة يمكن مراجعتها، وليس نموذجًا يخمّن. يتم توحيد الوحدات أولًا، فـ 0.5 جم و500 مجم يعتبران نفس التركيز.') }}</p>
+
+  <h2>{{ _('Where machine learning is used', 'أين يُستخدم تعلم الآلة') }}</h2>
+  <p>{{ _('In the search box. Names are compared by their letter patterns, so a misspelled name in Arabic or English still finds the right product. A mistake there only changes the order of a list you choose from.', 'في خانة البحث. تتم مقارنة الأسماء بأنماط الحروف، فالاسم المكتوب بخطأ إملائي بالعربية أو الإنجليزية يصل للدواء الصحيح. الخطأ هنا يغيّر فقط ترتيب قائمة تختار منها.') }}</p>
+
+  <h2>{{ _('What Badeel does not know', 'ما لا يعرفه بديل') }}</h2>
+  <ul>
+    <li>{{ _('It does not check interactions with your other medicines.', 'لا يفحص التداخلات مع أدويتك الأخرى.') }}</li>
+    <li>{{ _('Allergy warnings match the exact ingredient name only, not a whole family such as all penicillins.', 'تحذير الحساسية يطابق اسم المادة نفسها فقط، وليس العائلة كلها مثل كل البنسلينات.') }}</li>
+    <li>{{ _('Inactive ingredients (colours, lactose, sweeteners) are not recorded and can differ between brands.', 'المواد غير الفعالة (الألوان، اللاكتوز، المحليات) غير مسجلة وقد تختلف بين الشركات.') }}</li>
+    <li>{{ _('Availability is reported by pharmacists and can be out of date.', 'التوافر يسجله الصيادلة وقد يكون قديمًا.') }}</li>
+  </ul>
+  <p><strong>{{ _('Always confirm a change of medicine with a pharmacist or doctor.', 'راجع الصيدلي أو الطبيب دائمًا قبل تغيير الدواء.') }}</strong></p>
+</article>
+{% endblock %}

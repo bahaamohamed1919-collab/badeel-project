@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('Log in', 'تسجيل الدخول') }}{% endblock %}
+{% block content %}
+<section class="form-page">
+  <h1>{{ _('Log in', 'تسجيل الدخول') }}</h1>
+  <form method="post" class="form">
+    {{ csrf() }}
+    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+    <label>{{ _('E-mail', 'البريد الإلكتروني') }}
+      <input name="email" type="email" value="{{ email }}" required autocomplete="username" dir="ltr">
+    </label>
+    <label>{{ _('Password', 'كلمة المرور') }}
+      <input name="password" type="password" required autocomplete="current-password" dir="ltr">
+    </label>
+    <button class="btn" type="submit">{{ _('Log in', 'دخول') }}</button>
+  </form>
+  <p class="muted">{{ _('No account yet?', 'ليس لديك حساب؟') }} <a href="{{ url_for('auth.register') }}">{{ _('Create account', 'أنشئ حسابًا') }}</a></p>
+</section>
+{% endblock %}

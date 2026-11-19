@@ -1,0 +1,67 @@
+erDiagram
+    USERS ||--o{ FAVORITES : saves
+    USERS ||--o{ SEARCH_HISTORY : makes
+    USERS ||--o{ AUDIT_LOG : performs
+    DRUGS ||--o{ FAVORITES : "is saved in"
+    DRUGS ||--|{ DRUG_INGREDIENTS : contains
+    INGREDIENTS ||--o{ DRUG_INGREDIENTS : "appears in"
+    USERS {
+        int id PK
+        text name
+        text email UK
+        text password_hash "scrypt + salt"
+        text role "patient, pharmacist, admin"
+        text status "active, pending, disabled"
+        text allergies_enc "encrypted"
+        text consent_at
+        int failed_logins
+        text locked_until
+    }
+    DRUGS {
+        int id PK
+        text trade_name
+        text trade_name_ar
+        text form
+        real price
+        text availability
+        text drug_class
+        text ingredient_key "indexed"
+        text composition_key "indexed"
+        int strength_known
+    }
+    INGREDIENTS {
+        int id PK
+        text name UK
+    }
+    DRUG_INGREDIENTS {
+        int drug_id PK, FK
+        int ingredient_id PK, FK
+        real strength_value
+        text strength_unit
+    }
+    FAVORITES {
+        int user_id PK, FK
+        int drug_id PK, FK
+    }
+    SEARCH_HISTORY {
+        int id PK
+        int user_id FK
+        text query
+    }
+    AUDIT_LOG {
+        int id PK
+        int user_id FK
+        text action
+        text detail
+    }
+    SECURITY_EVENTS {
+        int id PK
+        text type
+        text ip
+        text path
+        text detail
+    }
+    SETTINGS {
+        text key PK
+        text value
+    }

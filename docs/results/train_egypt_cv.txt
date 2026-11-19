@@ -1,0 +1,14 @@
+  1500 drugs, 18000 generated queries, 5-fold grouped CV
+  fold 1: baseline top-1 82.3%  model top-1 92.5%
+  fold 2: baseline top-1 83.0%  model top-1 93.1%
+  fold 3: baseline top-1 81.9%  model top-1 93.1%
+  fold 4: baseline top-1 83.2%  model top-1 92.6%
+  fold 5: baseline top-1 84.5%  model top-1 94.0%
+all 18000 base 0.830 model 0.930 top3 0.973 mrr 0.952
+one_edit 3000 base 0.889 model 0.984 top3 0.994 mrr 0.989
+two_edits 3000 base 0.816 model 0.958 top3 0.974 mrr 0.966
+keyboard 3000 base 0.892 model 0.990 top3 0.996 mrr 0.993
+phonetic 3000 base 0.882 model 0.984 top3 0.994 mrr 0.989
+prefix 3000 base 0.758 model 0.804 top3 0.922 mrr 0.867
+arabic 3000 base 0.741 model 0.862 top3 0.959 mrr 0.910
+std 0.005546103069657034 rows 540226 sec 449.1

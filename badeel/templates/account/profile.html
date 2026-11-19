@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('My account', 'حسابي') }}{% endblock %}
+{% block content %}
+<h1 class="page-h">{{ _('My account', 'حسابي') }}</h1>
+<p class="muted" dir="ltr">{{ user.email }}</p>
+<div class="two">
+  <section>
+    <h2>{{ _('Profile and allergies', 'البيانات والحساسية') }}</h2>
+    <form method="post" class="form">
+      {{ csrf() }}<input type="hidden" name="action" value="profile">
+      <label>{{ _('Name', 'الاسم') }}
+        <input name="name" value="{{ user.name }}" required maxlength="80">
+      </label>
+      <label>{{ _('Active ingredients I am allergic to', 'مواد فعالة عندي حساسية منها') }}
+        <textarea name="allergies" rows="3" maxlength="500" dir="ltr" placeholder="Amoxicillin, Ibuprofen">{{ allergies }}</textarea>
+        <small>{{ _('Scientific names in English, separated by commas. Stored encrypted. You get a warning on any product that contains one of them. Empty the box and save to delete them.', 'الأسماء العلمية بالإنجليزية مفصولة بفواصل. تُحفظ مشفرة. يظهر لك تحذير على أي دواء يحتوي إحداها. لمسحها فضّي الخانة واحفظ.') }}</small>
+      </label>
+      <label class="radio"><input type="checkbox" name="consent" value="yes" {{ 'checked' if user.consent_at }}> {{ _('I agree that Badeel stores my allergy list (health data), encrypted, only to warn me. I can delete it at any time.', 'أوافق إن «بديل» يحفظ قائمة الحساسية بتاعتي (بيانات صحية) مشفرة، علشان يحذرني بس. وأقدر أمسحها في أي وقت.') }}</label>
+      <button class="btn" type="submit">{{ _('Save profile', 'حفظ البيانات') }}</button>
+    </form>
+  </section>
+  <section>
+    <h2>{{ _('Change password', 'تغيير كلمة المرور') }}</h2>
+    <form method="post" class="form">
+      {{ csrf() }}<input type="hidden" name="action" value="password">
+      <label>{{ _('Current password', 'كلمة المرور الحالية') }}
+        <input name="current_password" type="password" required autocomplete="current-password" dir="ltr">
+      </label>
+      <label>{{ _('New password', 'كلمة المرور الجديدة') }}
+        <input name="new_password" type="password" required minlength="15" autocomplete="new-password" dir="ltr">
+      </label>
+      <label>{{ _('Repeat new password', 'أعد كلمة المرور الجديدة') }}
+        <input name="confirm" type="password" required autocomplete="new-password" dir="ltr">
+      </label>
+      <button class="btn" type="submit">{{ _('Change password', 'تغيير كلمة المرور') }}</button>
+    </form>
+  </section>
+</div>
+{% endblock %}

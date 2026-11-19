@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('Search history', 'سجل البحث') }}{% endblock %}
+{% block content %}
+<div class="head-row">
+  <h1 class="page-h">{{ _('Search history', 'سجل البحث') }}</h1>
+  {% if rows %}
+  <form method="post" action="{{ url_for('account.clear_history') }}" data-confirm="{{ _('Delete your whole search history?', 'حذف سجل البحث كله؟') }}">
+    {{ csrf() }}<button class="btn ghost" type="submit">{{ _('Delete history', 'حذف السجل') }}</button>
+  </form>
+  {% endif %}
+</div>
+{% if rows %}
+<table class="table">
+  <thead><tr><th>{{ _('Search', 'البحث') }}</th><th>{{ _('When (UTC)', 'الوقت (UTC)') }}</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr><td><a href="{{ url_for('public.search', q=r.query) }}">{{ r.query }}</a></td><td dir="ltr">{{ r.created_at }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<section class="empty"><p>{{ _('Your searches appear here while you are logged in.', 'تظهر هنا عمليات البحث التي تجريها وأنت مسجل الدخول.') }}</p></section>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,98 @@
+
+BADEEL ATTACK SIMULATION  (temporary copy of the site, real database untouched)
+
+
+  SQL injection
+    [PROTECTED ] logged     login bypass: ' OR '1'='1
+    [PROTECTED ] logged     login bypass: admin@lab.test' --
+    [PROTECTED ] logged     login bypass: ' OR 1=1 --
+    [PROTECTED ] logged     login bypass: " OR ""="
+    [PROTECTED ] logged     login bypass: x' UNION SELECT 1,2,3,4,5,6,7,8,9,10 --
+    [PROTECTED ]            search box: '; DROP TABLE drugs; --
+    [PROTECTED ]            search box: %' OR 1=1 --
+    [PROTECTED ]            search box: 1' AND SLEEP(5) --
+
+  Cross-site scripting (XSS)
+    [PROTECTED ]            reflected: <script>alert(1)</script>
+    [PROTECTED ]            reflected: "><img src=x onerror=alert(1)>
+    [PROTECTED ]            reflected: <svg onload=alert(1)>
+    [PROTECTED ]            stored: script in a user name shown to admin
+    [PROTECTED ]            Content-Security-Policy blocks outside scripts
+
+  Cross-site request forgery (CSRF)
+    [PROTECTED ] logged     change profile with no token
+    [PROTECTED ] logged     change profile with a fake token
+    [PROTECTED ] logged     change profile with another visitor's token
+
+  Broken access control
+    [PROTECTED ]            visitor opens the admin panel
+    [PROTECTED ] logged     patient opens /admin/
+    [PROTECTED ] logged     patient opens /admin/users
+    [PROTECTED ] logged     patient opens /admin/import
+    [PROTECTED ] logged     patient opens /admin/security
+    [PROTECTED ] logged     patient opens /pharmacist
+    [PROTECTED ] logged     patient retrains the search model
+    [PROTECTED ] logged     patient changes a drug price
+    [PROTECTED ]            register directly as admin
+    [PROTECTED ]            unapproved pharmacist logs in
+    [PROTECTED ]            forged session cookie claiming to be the admin
+
+  Brute force
+    [PROTECTED ] logged     5 wrong passwords, then the right one
+    [PROTECTED ] logged     many accounts tried from one address (password spraying)
+    [PROTECTED ]            register with a well-known password
+
+  Account enumeration
+    [PROTECTED ]            same page for a real and a fake e-mail
+    [PROTECTED ]            same response time (real 101 ms / fake 99 ms)
+
+  Scanner and honeypot
+    [PROTECTED ] logged     scan /wp-login.php
+    [PROTECTED ] logged     scan /wp-admin
+    [PROTECTED ] logged     scan /wp-admin/
+    [PROTECTED ] logged     scan /administrator
+    [PROTECTED ] logged     scan /admin.php
+    [PROTECTED ] logged     scan /phpmyadmin
+    [PROTECTED ] logged     scan /phpmyadmin/
+    [PROTECTED ] logged     scan /pma
+    [PROTECTED ] logged     scan /.env
+    [PROTECTED ] logged     scan /.git/config
+    [PROTECTED ] logged     scan /config.php
+    [PROTECTED ] logged     scan /backup.sql
+    [PROTECTED ] logged     scan /db.sql
+    [PROTECTED ] logged     scan /xmlrpc.php
+    [PROTECTED ] logged     scan /cgi-bin/
+    [PROTECTED ] logged     scan /server-status
+    [PROTECTED ] logged     scan /manager/html
+    [PROTECTED ] logged     attacker types credentials into the fake login
+
+  Sensitive file exposure
+    [PROTECTED ]            download /instance/badeel.db
+    [PROTECTED ]            download /instance/data.key
+    [PROTECTED ]            download /static/../instance/data.key
+    [PROTECTED ]            download /static/..%2f..%2finstance%2fdata.key
+    [PROTECTED ]            download /badeel/schema.sql
+    [PROTECTED ]            download /manage.py
+    [PROTECTED ]            download /requirements.txt
+
+  Session security
+    [PROTECTED ]            session cookie hidden from JavaScript (HttpOnly)
+    [PROTECTED ]            session cookie not sent by other sites (SameSite)
+    [PROTECTED ]            X-Frame-Options header (clickjacking / sniffing)
+    [PROTECTED ]            X-Content-Type-Options header (clickjacking / sniffing)
+    [PROTECTED ]            open redirect to another website
+
+  Data protection
+    [PROTECTED ]            password stored as a salted hash, not as text
+    [PROTECTED ]            allergies unreadable in the database (encrypted)
+    [PROTECTED ]            upload an 11 MB file to fill the server
+
+  -------------------------------------------------------------
+  Attacks tried            : 65
+  Attack prevention rate   : 65/65 = 100%   (the site was protected)
+  Attack detection rate    : 35/35 = 100%   (attacks that must appear in the security log)
+  Time                     : 6.5 s
+
+  This is an automated check of known attack types, not a full penetration
+  test. A manual test with Burp Suite is still the next step.
+

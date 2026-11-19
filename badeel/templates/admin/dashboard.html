@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Admin', 'لوحة التحكم') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h1 class="page-h">{{ _('Overview', 'نظرة عامة') }}</h1>
+<dl class="facts">
+  <div><dt>{{ _('Drugs', 'الأدوية') }}</dt><dd>{{ stats.drugs }}</dd></div>
+  <div><dt>{{ _('Active ingredients', 'المواد الفعالة') }}</dt><dd>{{ stats.ingredients }}</dd></div>
+  <div><dt>{{ _('Users', 'المستخدمون') }}</dt><dd>{{ stats.users }}</dd></div>
+  <div><dt>{{ _('In shortage', 'نواقص') }}</dt><dd>{{ stats.shortages }}</dd></div>
+  <div><dt>{{ _('Security events, last 24 h', 'أحداث أمنية آخر 24 ساعة') }}</dt><dd>{{ stats.events_24h }}</dd></div>
+</dl>
+
+<h2>{{ _('Needs your attention', 'يحتاج انتباهك') }}</h2>
+<ul class="todo">
+  {% if stats.pending %}<li><a href="{{ url_for('admin.users') }}">{{ _('%s pharmacist account(s) waiting for approval', '%s حساب صيدلي في انتظار الموافقة') | format(stats.pending) }}</a></li>{% endif %}
+  {% if stats.no_strength %}<li>{{ _('%s drug(s) have no strength recorded, so they can never be matched', '%s دواء بدون تركيز مسجل ولا يمكن مطابقته') | format(stats.no_strength) }}</li>{% endif %}
+  <li>{{ _('%s drug(s) have no exact alternative in the database', '%s دواء ليس له بديل مطابق في قاعدة البيانات') | format(no_alt) }}</li>
+  {% if not stats.drugs %}<li><a href="{{ url_for('admin.import_data') }}">{{ _('The database is empty: import a CSV file', 'قاعدة البيانات فارغة: استورد ملف CSV') }}</a></li>{% endif %}
+</ul>
+
+<section class="panel model-panel" aria-labelledby="h-model">
+  <h2 id="h-model">{{ _('Search model', 'موديل البحث') }}</h2>
+  {% if model %}
+  <p>{{ _('Trained %s on %s drugs and %s generated misspellings.', 'اتدرب %s على %s دواء و%s اسم مكتوب غلط.') | format(model.trained_at, model.drugs, model.queries) }}</p>
+  <table class="table">
+    <thead><tr><th>{{ _('Tested on brands it never saw (5-fold cross-validation)', 'الاختبار على أسماء ما شافهاش (5-fold cross-validation)') }}</th><th class="num">{{ _('Right drug first', 'الدواء الصح أول نتيجة') }}</th></tr></thead>
+    <tbody>
+      <tr><td>{{ _('Search without the model', 'البحث من غير الموديل') }}</td><td class="num">{{ '%.1f%%' | format(model.cv.baseline.all.top1 * 100) }}</td></tr>
+      <tr><td><strong>{{ _('Search with the model', 'البحث بالموديل') }}</strong></td><td class="num"><strong>{{ '%.1f%%' | format(model.cv.model.all.top1 * 100) }}</strong></td></tr>
+    </tbody>
+  </table>
+  {% if model_stale %}<p class="alert warn">{{ _('The drug list changed after training. Train again so the model learns the new names.', 'قائمة الأدوية اتغيرت بعد التدريب. درّب الموديل تاني علشان يتعلم الأسماء الجديدة.') }}</p>{% endif %}
+  {% else %}
+  <p class="muted">{{ _('Not trained yet. Search works with TF-IDF only until you train it.', 'لسه ما اتدربش. البحث شغال بـ TF-IDF بس لحد ما تدربه.') }}</p>
+  {% endif %}
+  <form method="post" action="{{ url_for('admin.train_model') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button class="btn" type="submit">{{ _('Train search model', 'درّب موديل البحث') }}</button>
+    <span class="muted">{{ _('About 20 seconds for the demo data; 7 to 20 minutes for the full Egyptian list (keep the page open).', 'حوالي 20 ثانية مع البيانات التجريبية، ومن 7 لـ 20 دقيقة مع القائمة المصرية كاملة (سيب الصفحة مفتوحة).') }}</span>
+  </form>
+</section>
+
+<div class="two">
+  <section>
+    <h2>{{ _('Most searched', 'الأكثر بحثًا') }}</h2>
+    {% if top_searches %}
+    <table class="table"><tbody>
+      {% for s in top_searches %}<tr><td>{{ s.q }}</td><td class="num">{{ s.n }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% else %}<p class="muted">{{ _('No searches by logged-in users yet.', 'لا توجد عمليات بحث من مستخدمين مسجلين بعد.') }}</p>{% endif %}
+  </section>
+  <section>
+    <h2>{{ _('Latest security events', 'آخر الأحداث الأمنية') }}</h2>
+    {% if events %}
+    <table class="table"><tbody>
+      {% for e in events %}<tr><td><span class="badge {{ 'bad' if 'honeypot' in e.type else '' }}">{{ e.type }}</span></td><td dir="ltr">{{ e.ip }}</td><td dir="ltr">{{ e.created_at }}</td></tr>{% endfor %}
+    </tbody></table>
+    <p><a href="{{ url_for('admin.security_log') }}">{{ _('Open the full security log', 'افتح سجل الأمان كاملًا') }}</a></p>
+    {% else %}<p class="muted">{{ _('Nothing recorded.', 'لا يوجد شيء مسجل.') }}</p>{% endif %}
+  </section>
+</div>
+{% endblock %}

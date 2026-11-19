@@ -1,0 +1,12 @@
+added 22757 updated 5 skipped 2308 in 2.9s; ingredients 7034
+unspecified 1950 matchable 12206
+single 13159 single matchable 11036
+multi 9598 multi matchable 1170
+with alt 9752
+groups 2072 median 3 max 43
+forms [('tablet', 6623), ('injection', 2704), ('capsule', 2681), ('unspecified', 1950), ('cream', 1622), ('syrup', 1171), ('sachet', 886), ('gel', 774), ('suspension', 551), ('eye drops', 465), ('spray', 400), ('tablet (extended release)', 361)]
+---- independent audit sample (100), seed 31415 ----
+  1 STAMARIL VACCINE                                   | Vaccine Yellow Fever     | None                           | injection              | 0
+  2 HEALTHY DIET 12 TEABAGS                            | Green Coffee + Green Tea | None                           | unspecified            | 0
+  3 OFEV 150 MG 60 CAPS.                               | Nintedanib               | 150 mg                         | capsule                | 1
+  4 ARMOWAKE 150 MG 10 TABS. (N/A)                     | Armodafinil              | 150 mg                         | tablet                 | 1

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Security log', 'سجل الأمان') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h1 class="page-h">{{ _('Security log', 'سجل الأمان') }}</h1>
+<p class="muted">{{ _('Failed logins, locked accounts, rejected requests, and visits to the honeypot addresses that only attack tools look for.', 'محاولات الدخول الفاشلة، الحسابات المقفولة، الطلبات المرفوضة، وزيارات عناوين المصيدة (honeypot) التي لا يبحث عنها إلا أدوات الاختراق.') }}</p>
+
+<div class="two">
+  <section>
+    <h2>{{ _('By type', 'حسب النوع') }}</h2>
+    <p class="chips">
+      <a class="chip {{ 'on' if not kind }}" href="{{ url_for('admin.security_log') }}">{{ _('All', 'الكل') }}</a>
+      {% for t in types %}<a class="chip {{ 'on' if kind == t.type }}" href="{{ url_for('admin.security_log', type=t.type) }}">{{ t.type }} <span class="num">{{ t.n }}</span></a>{% endfor %}
+    </p>
+  </section>
+  <section>
+    <h2>{{ _('Most active addresses', 'أكثر العناوين نشاطًا') }}</h2>
+    {% if top_ips %}
+    <table class="table">
+      <thead><tr><th>IP</th><th>{{ _('Events', 'الأحداث') }}</th><th>{{ _('Active for', 'مدة النشاط') }}</th><th>{{ _('Last seen (UTC)', 'آخر ظهور (UTC)') }}</th></tr></thead>
+      <tbody>
+      {% for i in top_ips %}<tr><td dir="ltr">{{ i.ip }}</td><td class="num">{{ i.n }}</td><td class="num" dir="ltr">{{ '%d min %02d s' | format(i.seconds // 60, i.seconds % 60) }}</td><td dir="ltr">{{ i.last }}</td></tr>{% endfor %}
+    </tbody></table>
+    {% else %}<p class="muted">{{ _('Nothing recorded.', 'لا يوجد شيء مسجل.') }}</p>{% endif %}
+  </section>
+</div>
+
+{% if events %}
+<div class="table-scroll">
+<table class="table">
+  <thead><tr><th>{{ _('Time (UTC)', 'الوقت (UTC)') }}</th><th>{{ _('Type', 'النوع') }}</th><th>IP</th><th>{{ _('Path', 'المسار') }}</th><th>{{ _('Detail', 'التفاصيل') }}</th></tr></thead>
+  <tbody dir="ltr">
+  {% for e in events %}
+    <tr><td>{{ e.created_at }}</td><td><span class="badge {{ 'bad' if 'honeypot' in e.type or e.type == 'account_locked' else '' }}">{{ e.type }}</span></td><td>{{ e.ip }}</td><td>{{ e.path }}</td><td>{{ e.detail }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<section class="empty"><p>{{ _('No security events recorded.', 'لا توجد أحداث أمنية مسجلة.') }}</p></section>
+{% endif %}
+{% endblock %}

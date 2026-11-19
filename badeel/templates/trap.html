@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="robots" content="noindex">
+  <title>Log In</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/trap.css') }}">
+</head>
+<body>
+  <form method="post">
+    <h1>Administration</h1>
+    {% if failed %}<p class="err">Invalid username or password.</p>{% endif %}
+    <label>Username <input name="username" autocomplete="off"></label>
+    <label>Password <input name="password" type="password" autocomplete="off"></label>
+    <button type="submit">Log In</button>
+  </form>
+</body>
+</html>

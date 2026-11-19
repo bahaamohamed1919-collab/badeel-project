@@ -1,0 +1,7 @@
+Name,Arabic Name,Generic,Dosage Form,Manufacturer,Price,Category,Status
+Paracetol 500,باراسيتول 500,Paracetamol 500mg,Tabs,Demo Pharma,12,Analgesic and antipyretic,available
+Amoxiclav 1 g,أموكسيكلاف 1 جم,Amoxicillin 875mg + Clavulanic acid 125mg,F.C. Tablets,Demo Pharma,95,Penicillin antibiotic,available
+Omez 20,أوميز 20,Omeprazole 20 mg,Caps,Demo Pharma,38,Proton pump inhibitor,available
+,بدون اسم,Cetirizine 10 mg,Tablets,Demo Pharma,20,Antihistamine,available
+Wrongprice 10,سعر خطأ,Cetirizine 10 mg,Tablets,Demo Pharma,twenty,Antihistamine,available
+Noform 5,بدون شكل,Bisoprolol 5 mg,,Demo Pharma,40,Beta blocker,available

@@ -1,0 +1,46 @@
+// UML activity diagram: logging in, with brute-force protection
+digraph activity_login {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=11, nodesep=0.3, ranksep=0.3, pad=0.3, dpi=200, label="Activity diagram 2: log in with brute-force protection\nShaded = user action, white = done by Badeel", labelloc=t];
+  node  [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled", fillcolor=white, color="#1b2540", penwidth=1.3, margin="0.18,0.07"];
+  edge  [fontname="DejaVu Sans", fontsize=9, color="#1b2540", arrowsize=0.7];
+
+  start [shape=circle, label="", width=0.25, style=filled, fillcolor="#1b2540"];
+  enter [label="Enter e-mail and password", fillcolor="#e7ebf2"];
+  csrf  [shape=diamond, label="CSRF token\nvalid?"];
+  rej   [label="Reject (HTTP 400)\nlog csrf_rejected"];
+  ip    [shape=diamond, label="15 failures from this IP\nin the last 15 min?"];
+  slow  [label="Refuse (HTTP 429)\n\"try again in 15 minutes\""];
+  exist [shape=diamond, label="Account\nexists?"];
+  dummy [label="Verify against a dummy hash\n(same response time)\nlog login_failed"];
+  lock  [shape=diamond, label="Account locked?"];
+  lmsg  [label="Show \"locked for 15 minutes\"\nlog login_locked"];
+  pw    [shape=diamond, label="Password matches\nthe scrypt hash?"];
+  fail  [label="failed_logins + 1\nlog login_failed"];
+  five  [shape=diamond, label="5 failures?"];
+  dolock[label="Lock the account 15 minutes\nlog account_locked"];
+  gen   [label="Show the same message:\n\"Wrong e-mail or password\""];
+  st    [shape=diamond, label="Account status"];
+  pend  [label="\"Waiting for admin approval\""];
+  dis   [label="\"This account is disabled\""];
+  ok    [label="Reset counter, start a new session\n(new id, HttpOnly cookie, new CSRF token)"];
+  go    [label="Open the requested page"];
+  end   [shape=doublecircle, label="", width=0.2, style=filled, fillcolor="#1b2540"];
+
+  start -> enter -> csrf;
+  csrf -> rej [label=" no"]; rej -> end;
+  csrf -> ip [label=" yes"];
+  ip -> slow [label=" yes"]; slow -> end;
+  ip -> exist [label=" no"];
+  exist -> dummy [label=" no"]; dummy -> gen;
+  exist -> lock [label=" yes"];
+  lock -> lmsg [label=" yes"]; lmsg -> end;
+  lock -> pw [label=" no"];
+  pw -> fail [label=" no"]; fail -> five;
+  five -> dolock [label=" yes"]; dolock -> gen;
+  five -> gen [label=" no"];
+  gen -> end;
+  pw -> st [label=" yes"];
+  st -> pend [label=" pending"]; pend -> end;
+  st -> dis [label=" disabled"]; dis -> end;
+  st -> ok [label=" active"]; ok -> go -> end;
+}

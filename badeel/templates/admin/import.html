@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('Import data', 'استيراد البيانات') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h1 class="page-h">{{ _('Import drugs from a CSV file', 'استيراد الأدوية من ملف CSV') }}</h1>
+
+{% if report %}
+  {% if report.fatal %}
+  <div class="alert danger" role="alert"><strong>{{ _('Nothing was imported.', 'لم يتم استيراد شيء.') }}</strong> <span dir="ltr">{{ report.fatal }}</span></div>
+  {% else %}
+  <div class="alert ok" role="status">{{ _('Import finished: %s added, %s updated, %s skipped.', 'انتهى الاستيراد: %s أضيف، %s تم تحديثه، %s تم تخطيه.') | format(report.added, report.updated, report.skipped) }}</div>
+  {% if report.errors %}
+  <h2>{{ _('Skipped rows', 'الصفوف التي تم تخطيها') }}</h2>
+  <div class="table-scroll"><table class="table">
+    <thead><tr><th>{{ _('Line', 'السطر') }}</th><th>{{ _('Name', 'الاسم') }}</th><th>{{ _('Problem', 'المشكلة') }}</th></tr></thead>
+    <tbody>{% for line, name, error in report.errors %}<tr><td class="num">{{ line }}</td><td dir="ltr">{{ name }}</td><td dir="ltr">{{ error }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% endif %}
+  {% endif %}
+{% endif %}
+
+<div class="two">
+  <form method="post" enctype="multipart/form-data" class="form" data-confirm-if="mode=replace" data-confirm="{{ _('This deletes ALL current drugs before importing. Continue?', 'سيتم حذف كل الأدوية الحالية قبل الاستيراد. متابعة؟') }}">
+    {{ csrf() }}
+    <label>{{ _('CSV file (UTF-8, up to 10 MB)', 'ملف CSV (ترميز UTF-8، حتى 10 ميجابايت)') }}
+      <input type="file" name="file" accept=".csv" required>
+    </label>
+    <fieldset>
+      <legend>{{ _('What to do with the drugs already in the database', 'ماذا نفعل بالأدوية الموجودة حاليًا') }}</legend>
+      <label class="radio"><input type="radio" name="mode" value="append" checked> {{ _('Keep them. Add new rows and update rows that already exist.', 'أبقِها. أضف الجديد وحدّث الموجود.') }}</label>
+      <label class="radio"><input type="radio" name="mode" value="replace"> {{ _('Delete them all first (use this to replace the demo data).', 'احذفها كلها أولًا (استخدمه لاستبدال البيانات التجريبية).') }}</label>
+    </fieldset>
+    <button class="btn" type="submit">{{ _('Import file', 'استيراد الملف') }}</button>
+  </form>
+
+  <section class="prose">
+    <h2>{{ _('File format', 'شكل الملف') }}</h2>
+    <p><a href="{{ url_for('admin.import_template') }}">{{ _('Download the template file', 'نزّل ملف القالب') }}</a></p>
+    <table class="table">
+      <thead><tr><th>{{ _('Column', 'العمود') }}</th><th>{{ _('Example', 'مثال') }}</th></tr></thead>
+      <tbody dir="ltr">
+        <tr><td><strong>trade_name</strong> *</td><td>Augmentin 1 g</td></tr>
+        <tr><td><strong>active_ingredients</strong> *</td><td>Amoxicillin 875 mg + Clavulanic acid 125 mg</td></tr>
+        <tr><td><strong>form</strong> *</td><td>Tablets</td></tr>
+        <tr><td>trade_name_ar</td><td>أوجمنتين 1 جم</td></tr>
+        <tr><td>strength</td><td>500 mg</td></tr>
+        <tr><td>company</td><td>GSK</td></tr>
+        <tr><td>price</td><td>165</td></tr>
+        <tr><td>drug_class</td><td>Penicillin antibiotic</td></tr>
+        <tr><td>availability</td><td>available / shortage</td></tr>
+      </tbody>
+    </table>
+    <p>{{ _('Columns marked * are required. Use the strength column only if the strength is not written next to the ingredient. Rows with a problem are skipped and listed; the rest are saved.', 'الأعمدة المعلمة بـ * مطلوبة. استخدم عمود strength فقط إذا لم يكن التركيز مكتوبًا بجانب المادة. الصفوف التي بها مشكلة يتم تخطيها وعرضها، والباقي يُحفظ.') }}</p>
+  </section>
+</div>
+{% endblock %}

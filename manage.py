@@ -1,0 +1,228 @@
+"""Command-line tasks.
+
+    python manage.py setup                first-time setup (start_windows.bat runs this)
+    python manage.py init                 create the database + load demo data
+    python manage.py create-admin         create an admin account (asks for a password)
+    python manage.py demo-users           create / show the demo patient and pharmacist
+    python manage.py reset-demo           wipe everything except admins, reload demo data
+    python manage.py peek-users           show what is really stored for each user
+    python manage.py train-model          train the search ranking model
+    python manage.py audit-sample         print random products to check strength/form by hand
+    python manage.py import-csv FILE      import drugs from a CSV file
+    python manage.py import-csv FILE --replace    delete current drugs first
+"""
+import argparse
+import getpass
+import os
+import secrets
+import sys
+
+from flask import current_app
+
+from badeel import create_app, db, security
+from badeel.services import importer, ranker, search
+
+ROOT = os.path.dirname(os.path.abspath(__file__))
+
+# Accounts used to rehearse and present. Their passwords are generated on
+# each machine and kept in instance/demo_accounts.txt, which is not in Git.
+DEMO_ACCOUNTS = [
+    ("patient", "Demo Patient", "patient@badeel.demo"),
+    ("pharmacist", "Demo Pharmacist", "pharmacist@badeel.demo"),
+]
+
+
+def _accounts_file():
+    return os.path.join(os.path.dirname(current_app.config["DATABASE"]), "demo_accounts.txt")
+
+
+def _load_sample():
+    with open(os.path.join(ROOT, "data", "sample_drugs.csv"), "rb") as f:
+        report = importer.import_csv(f.read())
+    db.set_setting("demo_data", "1")
+    db.commit()
+    return report
+
+
+def cmd_init(_args):
+    if db.one("SELECT COUNT(*) AS n FROM drugs")["n"]:
+        print("Database already has drugs. Nothing changed.")
+        return
+    report = _load_sample()
+    print(f"Database ready. Demo drugs loaded: {report['added']} "
+          f"(skipped {report['skipped']}).")
+
+
+def cmd_create_admin(args):
+    email = (args.email or input("Admin e-mail: ")).strip().lower()
+    name = (args.name or input("Admin name: ")).strip()
+    # The password is typed here (hidden) or read from an environment variable.
+    # It is never written in the code or in Git.
+    password = os.environ.get("BADEEL_ADMIN_PASSWORD")
+    if not password:
+        print("Type the password. Nothing appears while you type: that is normal.")
+        password = getpass.getpass("Password: ")
+        if getpass.getpass("Repeat password: ") != password:
+            sys.exit("The two passwords do not match. Run the command again.")
+    if not security.EMAIL_RE.match(email):
+        sys.exit("Invalid e-mail.")
+    problem = security.password_problem(password, email, name)
+    if problem:
+        sys.exit("Password rejected: " + security.password_message(problem, lambda en, ar: en))
+    if db.one("SELECT 1 FROM users WHERE email = ?", (email,)):
+        db.execute("UPDATE users SET password_hash = ?, role = 'admin', status = 'active', "
+                   "failed_logins = 0, locked_until = NULL WHERE email = ?",
+                   (security.hash_password(password), email))
+        print("Existing account updated: it is now an active admin with the new password.")
+    else:
+        db.execute("INSERT INTO users (name, email, password_hash, role, status, created_at) "
+                   "VALUES (?, ?, ?, 'admin', 'active', ?)",
+                   (name or "Admin", email, security.hash_password(password), db.now()))
+        print("Admin account created.")
+    db.commit()
+
+
+def cmd_demo_users(_args):
+    path = _accounts_file()
+    missing = [a for a in DEMO_ACCOUNTS
+               if not db.one("SELECT 1 FROM users WHERE email = ?", (a[2],))]
+    if os.path.exists(path) and not missing:
+        with open(path, encoding="utf-8") as f:
+            print(f.read().rstrip())
+        return
+    lines = ["Demo accounts (for rehearsal and presentation only):"]
+    for role, name, email in DEMO_ACCOUNTS:
+        password = f"{role.capitalize()}-demo-{secrets.randbelow(900000) + 100000}"
+        if db.one("SELECT 1 FROM users WHERE email = ?", (email,)):
+            db.execute("UPDATE users SET password_hash = ?, role = ?, status = 'active', "
+                       "failed_logins = 0, locked_until = NULL WHERE email = ?",
+                       (security.hash_password(password), role, email))
+        else:
+            db.execute("INSERT INTO users (name, email, password_hash, role, status, created_at) "
+                       "VALUES (?, ?, ?, ?, 'active', ?)",
+                       (name, email, security.hash_password(password), role, db.now()))
+        lines.append(f"  {role:<11} {email:<24} {password}")
+    db.commit()
+    with open(path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines) + "\n")
+    print("\n".join(lines))
+
+
+def cmd_setup(_args):
+    """Safe to run every time: only does what is still missing."""
+    if not db.one("SELECT COUNT(*) AS n FROM drugs")["n"]:
+        cmd_init(None)
+    if not db.one("SELECT 1 FROM users WHERE role = 'admin' AND status = 'active'"):
+        print("\nCreate the admin account (you will use it to log in as admin).")
+        cmd_create_admin(argparse.Namespace(email=None, name=None))
+    if not ranker.model_info(os.path.dirname(current_app.config["DATABASE"])):
+        print("\nFirst run: training the search model...")
+        cmd_train_model(None)
+    print()
+    cmd_demo_users(None)
+    print("Admin: the e-mail and password you chose. Forgot it? Run: "
+          "python manage.py create-admin")
+
+
+def cmd_train_model(_args):
+    print("Training the search model. With the full Egyptian list this takes 5 to 20 minutes;"
+          " a line is printed after each of the 5 folds.", flush=True)
+    data = search.train_model(log=lambda m: print(m, flush=True))
+    cv = data["cv"]
+    print(f"Search model trained on {data['drugs']} drugs in {data['seconds']} s. "
+          f"Cross-validated top-1: model {cv['model']['all']['top1']:.1%}, "
+          f"without model {cv['baseline']['all']['top1']:.1%}.")
+
+
+def cmd_audit_sample(args):
+    """Random products with what was read from them, to check by hand."""
+    import random
+    rows = db.query("SELECT trade_name, ingredients_display, strength_display, form, "
+                    "pack_count, strength_known FROM drugs")
+    random.seed(args.seed)
+    print("no | trade name | ingredients | strength read | form read | pack | matchable")
+    for i, r in enumerate(random.sample(rows, min(args.n, len(rows))), 1):
+        print(f"{i:3} | {r['trade_name']} | {r['ingredients_display']} | "
+              f"{r['strength_display'] or '-'} | {r['form']} | {r['pack_count'] or '-'} | "
+              f"{'yes' if r['strength_known'] else 'no'}")
+
+
+def cmd_reset_demo(args):
+    if db.get_setting("demo_data") != "1":
+        print("WARNING: this database holds data you imported yourself. "
+              "Reset replaces it with the demo drugs.")
+    if not args.yes and input("Type RESET to delete all data except admin accounts: ") != "RESET":
+        sys.exit("Cancelled.")
+    for table in ("favorites", "search_history", "security_events", "audit_log",
+                  "drug_ingredients", "drugs", "ingredients"):
+        db.execute(f"DELETE FROM {table}")
+    db.execute("DELETE FROM users WHERE role != 'admin'")
+    db.execute("UPDATE users SET failed_logins = 0, locked_until = NULL")
+    report = _load_sample()
+    if os.path.exists(_accounts_file()):
+        os.remove(_accounts_file())
+    print(f"Reset done. Demo drugs: {report['added']}.")
+    cmd_train_model(None)
+    print()
+    cmd_demo_users(None)
+
+
+def cmd_peek_users(_args):
+    """Shows the raw database values: proof that nothing sensitive is readable."""
+    rows = db.query("SELECT email, role, status, password_hash, allergies_enc FROM users")
+    for r in rows:
+        print(f"{r['email']}  ({r['role']}, {r['status']})")
+        print(f"   password_hash : {r['password_hash'][:70]}...")
+        enc = r["allergies_enc"]
+        print(f"   allergies_enc : {(enc[:70] + '...') if enc else '(empty)'}")
+        if enc:
+            print(f"   decrypted     : {security.decrypt(enc)}   <- only the app, with the key, can do this")
+    if not rows:
+        print("No users.")
+
+
+def cmd_import(args):
+    with open(args.file, "rb") as f:
+        report = importer.import_csv(f.read(), replace=args.replace)
+    if report["fatal"]:
+        sys.exit("Import failed: " + report["fatal"])
+    if args.replace:
+        db.set_setting("demo_data", "0")
+        db.commit()
+    print(f"Added {report['added']}, updated {report['updated']}, skipped {report['skipped']}.")
+    for line, name, error in report["errors"]:
+        print(f"  line {line} ({name}): {error}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Badeel management commands")
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("setup").set_defaults(func=cmd_setup)
+    sub.add_parser("init").set_defaults(func=cmd_init)
+    p = sub.add_parser("create-admin")
+    p.add_argument("--email")
+    p.add_argument("--name")
+    p.set_defaults(func=cmd_create_admin)
+    sub.add_parser("demo-users").set_defaults(func=cmd_demo_users)
+    p = sub.add_parser("reset-demo")
+    p.add_argument("--yes", action="store_true")
+    p.set_defaults(func=cmd_reset_demo)
+    sub.add_parser("peek-users").set_defaults(func=cmd_peek_users)
+    sub.add_parser("train-model").set_defaults(func=cmd_train_model)
+    p = sub.add_parser("audit-sample")
+    p.add_argument("--n", type=int, default=100)
+    p.add_argument("--seed", type=int, default=1)
+    p.set_defaults(func=cmd_audit_sample)
+    p = sub.add_parser("import-csv")
+    p.add_argument("file")
+    p.add_argument("--replace", action="store_true")
+    p.set_defaults(func=cmd_import)
+    args = parser.parse_args()
+
+    app = create_app()
+    with app.app_context():
+        args.func(args)
+
+
+if __name__ == "__main__":
+    main()

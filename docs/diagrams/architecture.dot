@@ -1,0 +1,34 @@
+// Proposed system architecture: layered (presentation, business logic, data)
+digraph architecture {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=13, nodesep=0.25, ranksep=0.35, pad=0.3, dpi=200, compound=true, newrank=true];
+  node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", fillcolor=white, color="#1b2540", penwidth=1.3, margin="0.18,0.08", width=2.4];
+  edge  [fontname="DejaVu Sans", fontsize=11, color="#1b2540", arrowsize=0.8];
+
+  subgraph cluster_client { label="Client: web browser (desktop or phone)"; style="rounded,filled"; fillcolor="#f4f6f9"; color="#9aa5b8";
+    ui [label="HTML pages (Jinja2 templates), CSS, JavaScript\nArabic (right-to-left) and English", width=6.5]; }
+
+  subgraph cluster_app { label="Badeel web application (Python 3, Flask)"; style="rounded"; color="#1b2540"; penwidth=1.6;
+    sec [label="Security layer (security.py)\nsession and roles, CSRF check, security headers, login rate limits", fillcolor="#e2f3eb", color="#0b7a56", width=6.5];
+    subgraph cluster_routes { label="Presentation layer: routes/"; style="rounded,dashed"; color="#566076";
+      r1 [label="public\nsearch, drug page"]; r2 [label="auth\nregister, log in"]; r3 [label="account\nallergies, saved, history"];
+      r4 [label="pharmacist\navailability, price"]; r5 [label="admin\ndrugs, import, users, logs"]; r6 [label="trap\nhoneypot pages", fillcolor="#fbe5e2", color="#a8322a"]; }
+    subgraph cluster_services { label="Business logic layer: services/"; style="rounded,dashed"; color="#566076";
+      s1 [label="normalize\nnames, units, forms"]; s2 [label="market_names\nstrength and form\nfrom trade names"]; s3 [label="importer\nCSV validation"];
+      s4 [label="recommender\n3-level matching rule"]; s5 [label="search\nTF-IDF candidates"]; s6 [label="ranker\ntrained ranking model", fillcolor="#fff0d2", color="#8a5300"]; }
+    dbl [label="Data access layer (db.py): parameterized SQL only", width=6.5]; }
+
+  subgraph cluster_store { label="Server storage: instance/ folder (never uploaded to Git)"; style="rounded,filled"; fillcolor="#f4f6f9"; color="#9aa5b8";
+    db [label="SQLite database\nbadeel.db (9 tables)", shape=cylinder, width=2.2]; keys [label="session.key, data.key\nsecret keys", shape=note, width=2.2]; model [label="search_model.json\nmodel weights", shape=note, width=2.2]; }
+
+  ui -> sec [label="  HTTP request / response", dir=both];
+  sec -> r2 [lhead=cluster_routes];
+  r1 -> r4 [style=invis]; r2 -> r5 [style=invis]; r3 -> r6 [style=invis];
+  r5 -> s2 [ltail=cluster_routes, lhead=cluster_services];
+  s1 -> s4 [style=invis]; s2 -> s5 [style=invis]; s3 -> s6 [style=invis];
+  s5 -> dbl [ltail=cluster_services];
+  dbl -> db;
+  {rank=same; r1; r2; r3} {rank=same; r4; r5; r6}
+  {rank=same; s1; s2; s3} {rank=same; s4; s5; s6}
+  {rank=same; db; keys; model}
+  dbl -> keys [style=invis];
+}

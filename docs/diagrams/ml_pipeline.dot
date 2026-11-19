@@ -1,0 +1,27 @@
+// Trained search ranking model: training and use
+digraph ml_pipeline {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=13, nodesep=0.5, ranksep=0.32, pad=0.3, dpi=200, newrank=true];
+  node  [fontname="DejaVu Sans", fontsize=12, shape=box, style="rounded,filled", fillcolor=white, color="#1b2540", penwidth=1.3, margin="0.15,0.08"];
+  edge  [fontname="DejaVu Sans", fontsize=10.5, color="#1b2540", arrowsize=0.8];
+
+  subgraph cluster_train { label="Training (admin presses \"Train search model\" or runs ml/train.py)"; style="rounded"; color="#8a5300"; fontcolor="#8a5300";
+    a1 [label="Drug names\nin the database\n(English + Arabic)"];
+    a2 [label="Generate misspellings\n6 kinds: 1 typo, 2 typos,\nkeyboard, sound-alike,\nprefix, Arabic"];
+    a3 [label="TF-IDF picks 30\ncandidates per query"];
+    a4 [label="12 features per\n(query, candidate)\nlabel = 1 if correct"];
+    a5 [label="Logistic regression\n(standardized features,\nbalanced classes)", fillcolor="#fff0d2", color="#8a5300"];
+    a6 [label="Grouped 5-fold CV\n(brand never in train\nand test together)"];
+    a7 [label="search_model.json", shape=note];
+    a1 -> a2 -> a3 -> a4 -> a5 -> a7;
+    a4 -> a6 [style=dashed, label="evaluate"]; }
+
+  subgraph cluster_use { label="Use (every search)"; style="rounded"; color="#1b2540";
+    b1 [label="What the user typed"];
+    b2 [label="Normalize text,\napply aliases"];
+    b3 [label="TF-IDF: 30 candidates"];
+    b4 [label="Same 12 features"];
+    b5 [label="Model probability\nfor each candidate", fillcolor="#fff0d2", color="#8a5300"];
+    b6 [label="Results sorted by\nprobability"];
+    b1 -> b2 -> b3 -> b4 -> b5 -> b6; }
+  a7 -> b5 [style=dashed, label="weights"];
+}

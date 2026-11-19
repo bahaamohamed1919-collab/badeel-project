@@ -1,0 +1,60 @@
+trade_name,trade_name_ar,active_ingredients,form,company,price,drug_class,availability
+Panadol 500,بانادول,Paracetamol 500 mg,Tablets,GSK,42,Analgesic and antipyretic,shortage
+Abimol 500,أبيمول,Paracetamol 500 mg,Tablets,,18,Analgesic and antipyretic,available
+Paramol 500,بارامول,Paracetamol 500 mg,Tablets,,15,Analgesic and antipyretic,available
+Cetal 500,سيتال,Acetaminophen 0.5 g,Tablets,EIPICO,20,Analgesic and antipyretic,available
+Pyral 500,بيرال,Paracetamol 500 mg,Tablets,,16,Analgesic and antipyretic,unknown
+Panadol Extra,بانادول إكسترا,Paracetamol 500 mg + Caffeine 65 mg,Tablets,GSK,55,Analgesic and antipyretic,available
+Brufen 400,بروفين 400,Ibuprofen 400 mg,Tablets,Abbott,48,NSAID,available
+Brufen 600,بروفين 600,Ibuprofen 600 mg,Tablets,Abbott,60,NSAID,available
+Marcofen 400,ماركوفين 400,Ibuprofen 400 mg,Tablets,Marcyrl,30,NSAID,available
+Brufen Syrup,بروفين شراب,Ibuprofen 100 mg/5 ml,Syrup,Abbott,35,NSAID,shortage
+Marcofen Syrup,ماركوفين شراب,Ibuprofen 20 mg/ml,Syrup,Marcyrl,24,NSAID,available
+Cataflam 50,كتافلام 50,Diclofenac potassium 50 mg,Tablets,Novartis,62,NSAID,available
+Catafast 50,كتافاست,Diclofenac potassium 50 mg,Sachets,Novartis,70,NSAID,available
+Voltaren 50,فولتارين 50,Diclofenac sodium 50 mg,Tablets,Novartis,58,NSAID,available
+Olfen 50,أولفين 50,Diclofenac sodium 50 mg,Tablets,,34,NSAID,available
+Declophen 50,ديكلوفين 50,Diclofenac sodium 50 mg,Tablets,Pharco,28,NSAID,available
+Augmentin 1 g,أوجمنتين 1 جم,Amoxicillin 875 mg + Clavulanic acid 125 mg,Tablets,GSK,165,Penicillin antibiotic,shortage
+Hibiotic 1 g,هاي بيوتك 1 جم,Amoxicillin 875 mg + Clavulanic acid 125 mg,Tablets,Amoun,118,Penicillin antibiotic,available
+Megamox 1 g,ميجاموكس 1 جم,Amoxycillin 875 mg + Clavulanate 125 mg,Tablets,,110,Penicillin antibiotic,available
+Curam 1 g,كيورام 1 جم,Amoxicillin 875 mg + Clavulanic acid 125 mg,Tablets,Sandoz,140,Penicillin antibiotic,available
+Augmentin 625,أوجمنتين 625,Amoxicillin 500 mg + Clavulanic acid 125 mg,Tablets,GSK,120,Penicillin antibiotic,available
+Hibiotic 625,هاي بيوتك 625,Amoxicillin 500 mg + Clavulanic acid 125 mg,Tablets,Amoun,86,Penicillin antibiotic,available
+Augmentin 457 Suspension,أوجمنتين 457 معلق,Amoxicillin 400 mg/5 ml + Clavulanic acid 57 mg/5 ml,Suspension,GSK,95,Penicillin antibiotic,available
+Megamox 457 Suspension,ميجاموكس 457 معلق,Amoxicillin 400 mg/5 ml + Clavulanic acid 57 mg/5 ml,Suspension,,64,Penicillin antibiotic,available
+Zithromax 500,زيثروماكس 500,Azithromycin 500 mg,Tablets,Pfizer,150,Macrolide antibiotic,available
+Xithrone 500,زيثرون 500,Azithromycin 500 mg,Tablets,Amoun,84,Macrolide antibiotic,available
+Zisrocin 500,زيسروسين 500,Azithromycin 500 mg,Capsules,,78,Macrolide antibiotic,available
+Ciprobay 500,سيبروباي 500,Ciprofloxacin 500 mg,Tablets,Bayer,130,Quinolone antibiotic,unknown
+Ciprocin 500,سيبروسين 500,Ciprofloxacin 500 mg,Tablets,EIPICO,52,Quinolone antibiotic,available
+Ciprofar 500,سيبروفار 500,Ciprofloxacin 500 mg,Tablets,Pharco,48,Quinolone antibiotic,available
+Flagyl 500,فلاجيل 500,Metronidazole 500 mg,Tablets,Sanofi,36,Antiprotozoal,available
+Amrizole 500,أمريزول 500,Metronidazole 500 mg,Tablets,Amriya,22,Antiprotozoal,available
+Glucophage 500,جلوكوفاج 500,Metformin hydrochloride 500 mg,Tablets,Merck,40,Antidiabetic,available
+Cidophage 500,سيدوفاج 500,Metformin 500 mg,Tablets,CID,21,Antidiabetic,available
+Glucophage XR 500,جلوكوفاج إكس آر 500,Metformin 500 mg,Tablets XR,Merck,58,Antidiabetic,available
+Amaryl 2,أماريل 2,Glimepiride 2 mg,Tablets,Sanofi,66,Antidiabetic,available
+Concor 5,كونكور 5,Bisoprolol 5 mg,Tablets,Merck,75,Beta blocker,shortage
+Concor 10,كونكور 10,Bisoprolol 10 mg,Tablets,Merck,98,Beta blocker,available
+Norvasc 5,نورفاسك 5,Amlodipine 5 mg,Tablets,Pfizer,88,Calcium channel blocker,available
+Capoten 25,كابوتين 25,Captopril 25 mg,Tablets,,30,ACE inhibitor,available
+Capotril 25,كابوتريل 25,Captopril 25 mg,Tablets,,19,ACE inhibitor,available
+Lipitor 20,ليبيتور 20,Atorvastatin 20 mg,Tablets,Pfizer,160,Statin,available
+Ator 20,أتور 20,Atorvastatin 20 mg,Tablets,EIPICO,74,Statin,available
+Lipitor 40,ليبيتور 40,Atorvastatin 40 mg,Tablets,Pfizer,210,Statin,available
+Controloc 40,كونترولوك 40,Pantoprazole 40 mg,Tablets,Takeda,125,Proton pump inhibitor,available
+Pantoloc 40,بانتولوك 40,Pantoprazole 40 mg,Tablets,,82,Proton pump inhibitor,available
+Nexium 40,نيكسيوم 40,Esomeprazole 40 mg,Tablets,AstraZeneca,170,Proton pump inhibitor,available
+Losec 20,لوسك 20,Omeprazole 20 mg,Capsules,AstraZeneca,110,Proton pump inhibitor,unknown
+Omepak 20,أوميباك 20,Omeprazole 20 mg,Capsules,,45,Proton pump inhibitor,available
+Zyrtec 10,زيرتك 10,Cetirizine 10 mg,Tablets,,64,Antihistamine,available
+Cetrak 10,سيتراك 10,Cetirizine 10 mg,Tablets,,27,Antihistamine,available
+Histazine-1,هيستازين-1,Cetirizine 10 mg,Tablets,,25,Antihistamine,available
+Claritine 10,كلاريتين 10,Loratadine 10 mg,Tablets,,72,Antihistamine,available
+Mosedin 10,موسيدين 10,Loratadine 10 mg,Tablets,,29,Antihistamine,available
+Aspocid 75,أسبوسيد 75,Acetylsalicylic acid 75 mg,Tablets,CID,12,Antiplatelet,available
+Jusprin 81,جوسبرين 81,Aspirin 81 mg,Tablets,,14,Antiplatelet,available
+Ventolin Inhaler,فنتولين بخاخ,Salbutamol 100 mcg/dose,Inhaler,GSK,60,Bronchodilator,shortage
+Vental Inhaler,فنتال بخاخ,Albuterol 0.1 mg/puff,Inhaler,,38,Bronchodilator,available
+Antinal 200,أنتينال,Nifuroxazide 200 mg,Capsules,Amoun,26,Intestinal antiseptic,available

@@ -1,0 +1,8 @@
+/* Deliberately plain: this is the fake login page shown to scanners. */
+body { font-family: sans-serif; background: #f0f0f1; display: grid; place-items: center; min-height: 100vh; margin: 0; }
+form { background: #fff; padding: 24px; width: 300px; border: 1px solid #c3c4c7; }
+h1 { font-size: 20px; margin: 0 0 16px; }
+label { display: block; margin-bottom: 12px; font-size: 14px; }
+input { display: block; width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; }
+button { padding: 8px 14px; background: #2271b1; color: #fff; border: 0; cursor: pointer; }
+.err { color: #b32d2e; font-size: 14px; }

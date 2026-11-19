@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ _('Change log', 'سجل التغييرات') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h1 class="page-h">{{ _('Change log', 'سجل التغييرات') }}</h1>
+<p class="muted">{{ _('Every change made by an admin or a pharmacist: who, what and when.', 'كل تغيير قام به أدمن أو صيدلي: من، ماذا، ومتى.') }}</p>
+{% if rows %}
+<div class="table-scroll">
+<table class="table">
+  <thead><tr><th>{{ _('Time (UTC)', 'الوقت (UTC)') }}</th><th>{{ _('User', 'المستخدم') }}</th><th>{{ _('Action', 'الإجراء') }}</th><th>{{ _('Detail', 'التفاصيل') }}</th></tr></thead>
+  <tbody>
+  {% for r in rows %}
+    <tr><td dir="ltr">{{ r.created_at }}</td><td>{{ r.user_name or _('Deleted user', 'مستخدم محذوف') }}</td><td dir="ltr"><span class="badge">{{ r.action }}</span></td><td dir="ltr">{{ r.detail }}</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<section class="empty"><p>{{ _('No changes recorded yet.', 'لا توجد تغييرات مسجلة بعد.') }}</p></section>
+{% endif %}
+{% endblock %}

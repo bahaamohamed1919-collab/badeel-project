@@ -1,0 +1,12 @@
+Database ready. Demo drugs loaded: 59 (skipped 0).
+
+Create the admin account (you will use it to log in as admin).
+Admin e-mail: Admin name: Admin account created.
+
+Training the search model (about 20 seconds, first time only)...
+Search model trained on 59 drugs in 3.2 s. Cross-validated top-1: model 97.1%, without model 95.5%.
+
+Demo accounts (for rehearsal and presentation only):
+  patient     patient@badeel.demo      Patient-demo-678802
+  pharmacist  pharmacist@badeel.demo   Pharmacist-demo-398956
+Admin: the e-mail and password you chose. Forgot it? Run: python manage.py create-admin

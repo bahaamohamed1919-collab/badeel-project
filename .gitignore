@@ -1,0 +1,9 @@
+# secrets and the local database never go to GitHub
+instance/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.env
+.vscode/
+.DS_Store

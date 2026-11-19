@@ -1,0 +1,44 @@
+// UML activity diagram: searching a drug and getting its alternatives
+digraph activity_search {
+  graph [rankdir=TB, fontname="DejaVu Sans", fontsize=11, nodesep=0.35, ranksep=0.32, pad=0.3, dpi=200, label="Activity diagram 1: search a drug and view its alternatives\nShaded = user action, white = done by Badeel", labelloc=t];
+  node  [fontname="DejaVu Sans", fontsize=10, shape=box, style="rounded,filled", fillcolor=white, color="#1b2540", penwidth=1.3, margin="0.18,0.07"];
+  edge  [fontname="DejaVu Sans", fontsize=9, color="#1b2540", arrowsize=0.7];
+
+  start [shape=circle, label="", width=0.25, style=filled, fillcolor="#1b2540"];
+  type  [label="Type a drug name (Arabic or English,\nmay contain spelling mistakes)", fillcolor="#e7ebf2"];
+  norm  [label="Normalize the text\n(lower case, Arabic letter variants, known aliases)"];
+  cand  [label="TF-IDF character n-grams:\npick the 30 most similar drugs"];
+  m     [shape=diamond, label="Search model\ntrained?", style=filled, fillcolor=white];
+  rank  [label="Re-rank the 30 candidates with the\ntrained logistic-regression model"];
+  mg1   [shape=diamond, label="", width=0.3, height=0.3, style=filled, fillcolor=white];
+  show  [label="Show ranked results"];
+  pick  [label="Choose the prescribed product", fillcolor="#e7ebf2"];
+  known [shape=diamond, label="Strength and form\nknown?", style=filled, fillcolor=white];
+  warnk [label="Say that no product can be\nconfirmed as an exact match"];
+  exact [label="Exact alternatives: same composition key\n(every ingredient + strength) and same form\nsorted: available first, then cheapest"];
+  rel   [label="Same ingredients, different strength or form\n(the differing field is highlighted)"];
+  cls   [label="Same therapeutic class, different ingredient\n(labelled: only a doctor decides)"];
+  mg2   [shape=diamond, label="", width=0.3, height=0.3, style=filled, fillcolor=white];
+  allg  [shape=diamond, label="Patient logged in\nwith allergies?", style=filled, fillcolor=white];
+  dec   [label="Decrypt the allergy list and\ncompare with the ingredients"];
+  hit   [shape=diamond, label="Match?", style=filled, fillcolor=white];
+  red   [label="Show red allergy warning\nabove the alternatives"];
+  page  [label="Display the drug page"];
+  end   [shape=doublecircle, label="", width=0.2, style=filled, fillcolor="#1b2540"];
+
+  start -> type -> norm -> cand -> m;
+  m -> rank [label=" yes"];
+  m -> mg1 [label=" no"];
+  rank -> mg1 -> show -> pick -> known;
+  known -> warnk [label=" no"];
+  known -> exact [label=" yes"];
+  exact -> rel -> cls -> mg2;
+  warnk -> mg2;
+  mg2 -> allg;
+  allg -> dec [label=" yes"];
+  allg -> page [label=" no"];
+  dec -> hit;
+  hit -> red [label=" yes"];
+  hit -> page [label=" no"];
+  red -> page -> end;
+}

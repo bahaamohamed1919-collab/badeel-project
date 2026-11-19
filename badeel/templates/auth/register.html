@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('Create account', 'حساب جديد') }}{% endblock %}
+{% block content %}
+<section class="form-page">
+  <h1>{{ _('Create account', 'إنشاء حساب') }}</h1>
+  <form method="post" class="form">
+    {{ csrf() }}
+    <label>{{ _('Name', 'الاسم') }}
+      <input name="name" value="{{ form.name }}" required maxlength="80" autocomplete="name">
+    </label>
+    <label>{{ _('E-mail', 'البريد الإلكتروني') }}
+      <input name="email" type="email" value="{{ form.email }}" required autocomplete="username" dir="ltr">
+    </label>
+    <fieldset>
+      <legend>{{ _('Account type', 'نوع الحساب') }}</legend>
+      <label class="radio"><input type="radio" name="role" value="patient" {{ 'checked' if form.role != 'pharmacist' }}> {{ _('Patient', 'مريض') }}</label>
+      <label class="radio"><input type="radio" name="role" value="pharmacist" {{ 'checked' if form.role == 'pharmacist' }}> {{ _('Pharmacist (an admin approves the account first)', 'صيدلي (يحتاج موافقة الأدمن أولًا)') }}</label>
+    </fieldset>
+    <label>{{ _('Password', 'كلمة المرور') }}
+      <input name="password" type="password" required minlength="15" autocomplete="new-password" dir="ltr">
+      <small>{{ _('At least 15 characters. A short sentence works well, e.g. "tea with mint at 9".', '15 حرف على الأقل. جملة قصيرة تنفع، زي «شاي بالنعناع الساعة 9».') }}</small>
+    </label>
+    <label>{{ _('Repeat password', 'أعد كلمة المرور') }}
+      <input name="confirm" type="password" required autocomplete="new-password" dir="ltr">
+    </label>
+    {# Bot trap: hidden from people by CSS; only automated scripts fill it. #}
+    <div class="hp" aria-hidden="true"><label>Website <input name="website" tabindex="-1" autocomplete="off"></label></div>
+    <button class="btn" type="submit">{{ _('Create account', 'إنشاء الحساب') }}</button>
+  </form>
+  <p class="muted">{{ _('Already registered?', 'لديك حساب؟') }} <a href="{{ url_for('auth.login') }}">{{ _('Log in', 'سجّل الدخول') }}</a></p>
+</section>
+{% endblock %}

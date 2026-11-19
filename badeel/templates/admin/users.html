@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('Users', 'المستخدمون') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h1 class="page-h">{{ _('Users', 'المستخدمون') }} <span class="count">{{ rows | length }}</span></h1>
+<div class="table-scroll">
+<table class="table">
+  <thead><tr>
+    <th>{{ _('Name', 'الاسم') }}</th><th>{{ _('E-mail', 'البريد') }}</th><th>{{ _('Joined (UTC)', 'تاريخ التسجيل (UTC)') }}</th>
+    <th>{{ _('Role and status', 'الصلاحية والحالة') }}</th>
+  </tr></thead>
+  <tbody>
+  {% for u in rows %}
+    <tr class="{{ 'pending' if u.status == 'pending' }}">
+      <td>{{ u.name }}{% if u.id == user.id %} <span class="badge">{{ _('You', 'أنت') }}</span>{% endif %}</td>
+      <td dir="ltr">{{ u.email }}</td>
+      <td dir="ltr">{{ u.created_at }}</td>
+      <td>
+        <form class="inline-form" method="post" action="{{ url_for('admin.user_update', user_id=u.id) }}">
+          {{ csrf() }}
+          <label class="sr" for="role{{ u.id }}">{{ _('Role', 'الصلاحية') }}</label>
+          <select id="role{{ u.id }}" name="role">
+            <option value="patient" {{ 'selected' if u.role == 'patient' }}>{{ _('Patient', 'مريض') }}</option>
+            <option value="pharmacist" {{ 'selected' if u.role == 'pharmacist' }}>{{ _('Pharmacist', 'صيدلي') }}</option>
+            <option value="admin" {{ 'selected' if u.role == 'admin' }}>{{ _('Admin', 'أدمن') }}</option>
+          </select>
+          <label class="sr" for="st{{ u.id }}">{{ _('Status', 'الحالة') }}</label>
+          <select id="st{{ u.id }}" name="status">
+            <option value="active" {{ 'selected' if u.status == 'active' }}>{{ _('Active', 'نشط') }}</option>
+            <option value="pending" {{ 'selected' if u.status == 'pending' }}>{{ _('Waiting for approval', 'في انتظار الموافقة') }}</option>
+            <option value="disabled" {{ 'selected' if u.status == 'disabled' }}>{{ _('Disabled', 'موقوف') }}</option>
+          </select>
+          <button class="btn ghost" type="submit">{{ _('Save', 'حفظ') }}</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf with context %}
+{% block title %}{{ _('Edit drug', 'تعديل دواء') if drug_id else _('Add a drug', 'إضافة دواء') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<h1 class="page-h">{{ _('Edit drug', 'تعديل دواء') if drug_id else _('Add a drug', 'إضافة دواء') }}</h1>
+<form method="post" class="form wide">
+  {{ csrf() }}
+  <div class="two">
+    <label>{{ _('Trade name (English)', 'الاسم التجاري (إنجليزي)') }}
+      <input name="trade_name" value="{{ form.trade_name }}" required maxlength="150" dir="ltr">
+    </label>
+    <label>{{ _('Trade name (Arabic)', 'الاسم التجاري (عربي)') }}
+      <input name="trade_name_ar" value="{{ form.trade_name_ar }}" maxlength="150" dir="rtl">
+    </label>
+  </div>
+  <label>{{ _('Active ingredients with strength', 'المواد الفعالة مع التركيز') }}
+    <input name="active_ingredients" value="{{ form.active_ingredients }}" required dir="ltr" placeholder="Amoxicillin 875 mg + Clavulanic acid 125 mg">
+    <small>{{ _('One ingredient: “Paracetamol 500 mg”. Several: separate with “+”. Liquids: “Ibuprofen 100 mg/5 ml”.', 'مادة واحدة: “Paracetamol 500 mg”. أكثر من مادة: افصل بـ “+”. السوائل: “Ibuprofen 100 mg/5 ml”.') }}</small>
+  </label>
+  <div class="two">
+    <label>{{ _('Form', 'الشكل الدوائي') }}
+      <input name="form" value="{{ form.form }}" required list="forms" dir="ltr" placeholder="Tablets">
+      <datalist id="forms">{% for f in forms %}<option value="{{ f }}">{% endfor %}</datalist>
+    </label>
+    <label>{{ _('Company', 'الشركة') }}
+      <input name="company" value="{{ form.company }}" maxlength="120">
+    </label>
+    <label>{{ _('Price', 'السعر') }}
+      <input name="price" type="number" min="0" step="0.01" value="{{ form.price }}">
+    </label>
+    <label>{{ _('Therapeutic class', 'المجموعة العلاجية') }}
+      <input name="drug_class" value="{{ form.drug_class }}" maxlength="120" dir="ltr">
+    </label>
+    <label>{{ _('Availability', 'التوافر') }}
+      <select name="availability">
+        <option value="unknown" {{ 'selected' if form.availability == 'unknown' }}>{{ _('Unknown', 'غير معروف') }}</option>
+        <option value="available" {{ 'selected' if form.availability == 'available' }}>{{ _('Available', 'متوفر') }}</option>
+        <option value="shortage" {{ 'selected' if form.availability == 'shortage' }}>{{ _('Shortage', 'ناقص') }}</option>
+      </select>
+    </label>
+  </div>
+  <div class="form-actions">
+    <button class="btn" type="submit">{{ _('Save drug', 'حفظ الدواء') }}</button>
+    <a class="btn ghost" href="{{ url_for('admin.drugs') }}">{{ _('Cancel', 'إلغاء') }}</a>
+  </div>
+</form>
+{% endblock %}

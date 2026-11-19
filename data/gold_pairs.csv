@@ -1,0 +1,41 @@
+drug_a,drug_b,is_alternative,reason
+Panadol 500,Abimol 500,1,same ingredient strength and form
+Panadol 500,Cetal 500,1,acetaminophen 0.5 g equals paracetamol 500 mg
+Panadol 500,Pyral 500,1,same
+Panadol 500,Panadol Extra,0,extra ingredient (caffeine)
+Panadol 500,Brufen 400,0,different ingredient
+Brufen 400,Marcofen 400,1,same
+Brufen 400,Brufen 600,0,different strength
+Brufen Syrup,Marcofen Syrup,1,100 mg per 5 ml equals 20 mg per ml
+Brufen Syrup,Brufen 400,0,different form
+Cataflam 50,Voltaren 50,0,different salt (potassium vs sodium)
+Cataflam 50,Catafast 50,0,different form (tablet vs sachet)
+Voltaren 50,Olfen 50,1,same
+Voltaren 50,Declophen 50,1,same
+Augmentin 1 g,Hibiotic 1 g,1,same
+Augmentin 1 g,Megamox 1 g,1,amoxycillin and clavulanate are other spellings
+Augmentin 1 g,Curam 1 g,1,same
+Augmentin 1 g,Augmentin 625,0,different strength
+Augmentin 625,Hibiotic 625,1,same
+Augmentin 457 Suspension,Megamox 457 Suspension,1,same
+Augmentin 457 Suspension,Augmentin 625,0,different form and strength
+Zithromax 500,Xithrone 500,1,same
+Zithromax 500,Zisrocin 500,0,different form (tablet vs capsule)
+Ciprobay 500,Ciprocin 500,1,same
+Ciprocin 500,Ciprofar 500,1,same
+Flagyl 500,Amrizole 500,1,same
+Glucophage 500,Cidophage 500,1,hydrochloride is the same drug
+Glucophage 500,Glucophage XR 500,0,extended release differs
+Concor 5,Concor 10,0,different strength
+Capoten 25,Capotril 25,1,same
+Lipitor 20,Ator 20,1,same
+Lipitor 20,Lipitor 40,0,different strength
+Controloc 40,Pantoloc 40,1,same
+Controloc 40,Nexium 40,0,different ingredient same class
+Losec 20,Omepak 20,1,same
+Zyrtec 10,Cetrak 10,1,same
+Zyrtec 10,Histazine-1,1,same
+Zyrtec 10,Claritine 10,0,different ingredient same class
+Claritine 10,Mosedin 10,1,same
+Aspocid 75,Jusprin 81,0,different strength
+Ventolin Inhaler,Vental Inhaler,1,albuterol 0.1 mg per puff equals salbutamol 100 mcg per dose

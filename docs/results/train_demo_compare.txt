@@ -1,0 +1,40 @@
+TRAINING THE SEARCH RANKING MODEL
+  59 drugs, 2118 generated queries, 5-fold grouped CV
+  fold 1: baseline top-1 96.1%  model top-1 98.6%
+  fold 2: baseline top-1 96.8%  model top-1 97.9%
+  fold 3: baseline top-1 95.1%  model top-1 96.1%
+  fold 4: baseline top-1 95.1%  model top-1 97.9%
+  fold 5: baseline top-1 94.4%  model top-1 94.9%
+
+   kind of query              queries  baseline top-1  model top-1  model top-3  model MRR
+   all queries                   2118          95.5%        97.1%        99.8%      0.984
+   one typo                       354          98.6%        99.7%       100.0%      0.998
+   two typos                      354          93.5%        96.9%        99.4%      0.983
+   neighbouring key               354          98.6%        99.7%       100.0%      0.998
+   sound-alike spelling           354          97.2%        99.7%       100.0%      0.998
+   only first letters typed       348          88.2%        88.2%        99.4%      0.935
+   Arabic name with a typo        354          96.9%        98.3%       100.0%      0.992
+
+   Errors reduced by 35% (top-1 errors 4.5% -> 2.9%); fold-to-fold spread +/- 1.4%
+
+   Feature weights (positive = makes a candidate more likely to be the answer):
+     number_mismatch -3.31
+     stem_sim        +3.31
+     tfidf_rank      +1.49
+     tfidf           -0.81
+     name_sim        -0.54
+     is_arabic       -0.52
+     first_letter    +0.45
+     length_ratio    +0.42
+     number_match    +0.40
+     starts_with     +0.28
+     contains        +0.26
+     prefix          +0.16
+
+   Trained on 59 drugs, 2118 generated queries, 60103 candidate rows, in 18.7 s.
+   Saved to instance/search_model.json. The website uses it immediately.
+
+   MODEL COMPARISON (same 5 grouped folds)
+   Logistic regression (used)   top-1 97.1% +/- 1.4%   MRR 0.984
+   Gradient boosting            top-1 96.7% +/- 1.2%   MRR 0.982
+   Random forest                top-1 96.3% +/- 1.0%   MRR 0.980

@@ -1,0 +1,23 @@
+1) RESPONSE TIME AND THROUGHPUT  (real HTTP, temporary copy of the site)
+   2000 requests, 20 at the same time, 59 drugs
+
+   page         requests    average   95% under
+   home              207     78.8 ms    104.7 ms
+   search            595     79.9 ms    104.3 ms
+   drug              797     89.5 ms    122.9 ms
+   suggest           401     77.3 ms    102.2 ms
+
+   One user alone     : average 3.5 ms per page
+   Throughput         : 239 requests per second
+   Average response   : 83.1 ms (with 20 users at once)
+   95% of requests in : 113.6 ms or less
+   Failed requests    : 0
+   (Measured on the Flask development server. A production server such as
+    waitress or gunicorn with several workers is faster.)
+
+2) SCALABILITY  (20,000 generated drugs, 480 generated ingredients)
+   CSV import            : 20,000 drugs in 1.7 s (11,981 rows per second)
+   Search index build    : 791 ms (once, after the data changes)
+   Search, TF-IDF only   : average 9.8 ms, 95% under 12.0 ms
+   Search with the model : average 10.5 ms, 95% under 13.3 ms
+   Find all alternatives : average 0.35 ms, 95% under 0.56 ms

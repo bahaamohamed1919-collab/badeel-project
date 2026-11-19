@@ -1,0 +1,101 @@
+---- independent audit sample (100), seed 31415 ----
+  1 STAMARIL VACCINE                                   | Vaccine Yellow Fever     | None                           | injection              | 0
+  2 HEALTHY DIET 12 TEABAGS                            | Green Coffee + Green Tea | None                           | unspecified            | 0
+  3 OFEV 150 MG 60 CAPS.                               | Nintedanib               | 150 mg                         | capsule                | 1
+  4 ARMOWAKE 150 MG 10 TABS. (N/A)                     | Armodafinil              | 150 mg                         | tablet                 | 1
+  5 RUBLEX GEL 50 GM                                   | Camphor + Horse Chestnut | None                           | gel                    | 0
+  6 RESOURCE JUNIOR POWDER 400 GM                      | Nutritive Powder Formula | None                           | unspecified            | 0
+  7 NATARIA CREAM 50 GM                                | Panthenol + Calendula Ex | None                           | cream                  | 0
+  8 COAGULOBAN 60 MG 20 TABS.                          | Edoxaban                 | 60 mg                          | tablet                 | 1
+  9 VERDANBURN 30 CAPS                                 | Garcinia Cambogia + Chro | None                           | capsule                | 0
+ 10 MARGENA CREAM 50 GM                                | Aloe Vera Oil + Grapefru | None                           | cream                  | 0
+ 11 MO TRUE 200 GM 10SACHETS                           | Wheyprotein + Vitamins   | None                           | sachet                 | 0
+ 12 DMAE 100 MG 100 CAPS. (ILLEGAL IMPORT)             | Dmae                     | 100 mg                         | capsule                | 1
+ 13 PARACETAMOL-CID 500 MG 20 TABS.                    | Paracetamol              | 500 mg                         | tablet                 | 1
+ 14 PRANDAGLIM PLUS 25/30 MG 30 F.C. TABS.             | Alogliptin + Pioglitazon | 25 mg / 30 mg (as on the pack) | tablet                 | 1
+ 15 MEXTRA 20 PIECES                                   | Iron + Zinc + Copper     | None                           | unspecified            | 0
+ 16 ATOZET 40/10MG 30 F.C. TAB.                        | Atorvastatin + Ezetimibe | 40 mg / 10 mg (as on the pack) | tablet                 | 1
+ 17 VITACID C 1 GM 12 EFF. TAB.                        | Vitamin C                | 1 gm                           | effervescent           | 1
+ 18 ETHANOLAMINE OLEATE 5% AMP                         | Ethanolamine Oleate      | 5 %                            | injection              | 1
+ 19 TORIA IMMUNITY BOOST 10 SACHETS                    | Colostrum + Lactoferin + | None                           | sachet                 | 0
+ 20 WATER FOR INJECTION (MOTTAHEDOON) VIAL 500 ML      | Water For Injection      | None                           | injection              | 0
+ 21 CHICKS GROWEE FOR KIDS SYRUP 250 ML                | L-arginine + Omega-3 + Z | None                           | syrup                  | 0
+ 22 LICE CLEAN 0.5GM/100ML TOPICAL LOTION              | Malathion                | 0.5 gm/100 ml                  | lotion                 | 1
+ 23 ALLERGYL 2MG/5ML SYRUP 120ML                       | Chlorpheniramine         | 2 mg/5 ml                      | syrup                  | 1
+ 24 GYPTI CAL.D.K PLUS 30 TABS.                        | Calcium + Magnesium + Vi | None                           | tablet                 | 0
+ 25 RHINOPRO SUSP. 90ML                                | Carbinoxamine + Pseudoep | None                           | suspension             | 0
+ 26 REGNAVIT 30 F.C.TAB.                               | Minerals + Vitamins      | None                           | tablet                 | 0
+ 27 VISANNE 2 MG 28 TABS.                              | Dienogest                | 2 mg                           | tablet                 | 1
+ 28 OXILAB SACHETS 30 SACHET FOR WOMEN(150 GM)         | L-carnitine + Acetyl L-c | None                           | sachet                 | 0
+ 29 FREQUEGARD 7.5 MG 7 EXT. REL. F.C. TAB.            | Darifenacin              | 7.5 mg                         | tablet (extended release) | 1
+ 30 RANDU 30 PILLS                                     | Calcium + Magnesium + Vi | None                           | unspecified            | 0
+ 31 NIFUNAL 4% 90ML SUSP.                              | Nifuroxazide             | 4 %                            | suspension             | 1
+ 32 VASCULAR 20MG 20 TABS.                             | Isoxsuprine              | 20 mg                          | tablet                 | 1
+ 33 GAYA 10 SACHET                                     | Lactoferrin + Colostrum  | None                           | sachet                 | 0
+ 34 URICOL 6 EFF. GR. IN SACHETS (N/A)                 | Hexamine + Khellin + Pip | None                           | effervescent           | 0
+ 35 UBRETID 5 MG 20 TAB.                               | Distigmine Bromide       | 5 mg                           | tablet                 | 1
+ 36 GENICA RAY SUN SCREEN SPF 50+ CREAM 100 GM         | Sun Protection Formula   | None                           | cream                  | 0
+ 37 MI KIDS SHAMPOO 90 ML                              | Biotin + Coconut Oil + A | None                           | shampoo                | 0
+ 38 ESO-PROTOCOL 40MG 10 CAPS.                         | Esomeprazole             | 40 mg                          | capsule                | 1
+ 39 IVY ACETYL ZINC SYRUP 120 ML                       | Acetylcysteine + Ivy Lea | None                           | syrup                  | 0
+ 40 NEXIMERICAN 20 MG 7 CAPS. (N/A)                    | Esomeprazole             | 20 mg                          | capsule                | 1
+ 41 INFAJOY OINT. 50 GM                                | Nigella Sativa + Zinc Ox | None                           | ointment               | 0
+ 42 GRODESIRE SYRUP 120 ML                             | Anise Fruit Extract + Pe | None                           | syrup                  | 0
+ 43 BEDOXINE 20 TAB.                                   | Vitamin B1 + Vitamin B6  | None                           | tablet                 | 0
+ 44 SUCCINYLCHOLINE CHLORIDE 100MG/5ML 5 I.V. AMPS.    | Succinylcholine Chloride | 100 mg/5 ml                    | injection              | 1
+ 45 ITAMI-SEB TABLETS                                  | Pea + Turmeric Extract + | None                           | tablet                 | 0
+ 46 EXTRAUMA DNA FORTE TOPICAL GEL 40 GM               | Hirudin                  | None                           | gel                    | 0
+ 47 PROTE SUN CREAM 50 GM                              | Sun Protection Formula   | None                           | cream                  | 0
+ 48 TURMERIC CURCUMIN 1000 MG 60 CAPS. (PURITANS PRIDE | Tumeric Ext + Black Pepp | None                           | capsule                | 0
+ 49 HAIR STABIL HAIR SHAMPOO 100ML                     | Piroctone Olamine + Extr | None                           | shampoo                | 0
+ 50 BRONOTROL 2.5MG/5ML SYRUP 120 ML                   | Fenoterol Hydrobromide   | 2.5 mg/5 ml                    | syrup                  | 1
+ 51 ALOE VERA WEISER 5 HAIR AMPOULES 10 ML             | Aloe Vera Extract        | None                           | injection              | 0
+ 52 DOLPHIN K 75MG/3ML I.M. 6 AMP.                     | Diclofenac Potassium     | 75 mg/3 ml                     | injection              | 1
+ 53 FOLLITONE HAIR CREAM 60 GM                         | Rosemary Extract + Jojob | None                           | cream                  | 0
+ 54 GASTAMOXACINE 400MG 7 F.C. TAB.                    | Moxifloxacin             | 400 mg                         | tablet                 | 1
+ 55 STREPTOLASE 1.5 MIU I.V VIAL                       | Streptokinase            | None                           | injection              | 0
+ 56 NITRO VIT PLUS POWDER 10 SACHETS 20 GM             | Total Fat + Saturated Fa | None                           | sachet                 | 0
+ 57 CARBOPLATIN (ACTAVIS) 450MG VIAL(N/A)              | Carboplatin              | 450 mg                         | injection              | 1
+ 58 QUINOFLOXACHEM 400 MG 10 F.C.TABS.                 | Moxifloxacin             | 400 mg                         | tablet                 | 1
+ 59 FENTANILO 50 MCG/HR 5 TRANSDERMAL PATCH (NET PRICE | Fentanyl                 | None                           | unspecified            | 0
+ 60 NYRIN 50MG/5ML 5 SOL. IN AMP. FOR I.V INJ.         | Leucovorin Calcium=folin | 50 mg/5 ml                     | injection              | 1
+ 61 CARE DIPINE 10MG 20 F.C.TABS. (N/A)                | Lercanidipine            | 10 mg                          | tablet                 | 1
+ 62 CHOLEROSE 5 MG 14 F.C.TABS.                        | Rosuvastatin             | 5 mg                           | tablet                 | 1
+ 63 TRITOSPOT CREAM 15 GM                              | Euselx Oily + Hydrocorti | None                           | cream                  | 0
+ 64 CLOSEAS 30 S.G. CAPS.                              | Cod Liver Oil            | None                           | capsule                | 0
+ 65 OXYTOCIN 10 I.U 10 AMP. (N/A)                      | Oxytocin                 | 10 iu                          | injection              | 1
+ 66 TEBOFORTIN 40 MG 30 F.C.TABS.                      | Ginkgo Biloba            | 40 mg                          | tablet                 | 1
+ 67 ABIMOL 300MG 5 RECTAL SUPP.                        | Paracetamol              | 300 mg                         | suppository            | 1
+ 68 LACTOTRI 30 CAPSULES                               | Lactoferrin + Zinc + Vit | None                           | capsule                | 0
+ 69 GRAMOCEF 1 GM 8 F.C.TAB                            | Cefalexin                | 1 gm                           | tablet                 | 1
+ 70 AQUA V - VAGINAL GEL 60 ML                         | Sodium Lauryl Ethersulph | None                           | gel                    | 0
+ 71 KIDS DAILY VIT APPETITE SYRUP 125 ML               | L-lysine + B Complex + I | None                           | syrup                  | 0
+ 72 ORANGE C 12 EFF. TABS.                             | Vitamin C + Zinc         | None                           | effervescent           | 0
+ 73 ULTRAGRISEOFULVIN 2.5% SUSP. 100ML                 | Griseofulvin             | 2.5 %                          | suspension             | 1
+ 74 ACZONE 30 GM GEL                                   | Lactic Acid + Marine Col | None                           | gel                    | 0
+ 75 ZONELOCK 14 CAPSULES                               | Esomeprazole             | 40 mg                          | capsule                | 1
+ 76 PHENOBARBITAL 100 MG 20 TAB.                       | Phenobarbitone           | 100 mg                         | tablet                 | 1
+ 77 AFROMED 30 CAPS.                                   | Tribulus + Ginseng + Mac | None                           | capsule                | 0
+ 78 ZYMALGE TOPICAL GEL 50 GM                          | Antimicrobial Enzymes +  | None                           | gel                    | 0
+ 79 EPICARE HAND SANITIZER TOPICAL SOLUTION 125 ML     | Alcohol                  | 80 %                           | unspecified            | 0
+ 80 VITIFECT SYRUP 120 ML                              | Multivitamins + Calcium  | None                           | syrup                  | 0
+ 81 RIVALO 10 SACHETS                                  | Vitamin C + Zinc + Vitam | None                           | sachet                 | 0
+ 82 ARTILANE CLASSIC 15 BOTTLES 10 ML                  | Enzymatic Hydrolyzed Col | None                           | unspecified            | 0
+ 83 SKIN MIX CREAM 60 GM                               | Liquorice + Titanium Dio | None                           | cream                  | 0
+ 84 PROFUSOL 600MG 30 S.G. CAPS. (N/A)                 | Ibuprofen                | 600 mg                         | capsule                | 1
+ 85 UROMITEXAN 400MG/4ML 15 I.V.AMP.                   | Mesna                    | 400 mg/4 ml                    | injection              | 1
+ 86 VITATRON 30 CAPS                                   | Multivitamins + Minerals | None                           | capsule                | 0
+ 87 MELANOR 20 SACHET                                  | Omega + Vit B1 + B6 + B1 | 1 gm + ? + ? + ?               | sachet                 | 0
+ 88 LUMIERE HAIR OIL 100ML                             | Panthenol + Aloe Vera +  | None                           | unspecified            | 0
+ 89 CHOLAFLUX 50 MG 10 F.C.TABS.                       | Eplerenone               | 50 mg                          | tablet                 | 1
+ 90 HOMO 10 SACHETS                                    | Lactoferrin + Colostrum  | None                           | sachet                 | 0
+ 91 STERILE WATER FOR IRRIGATION (EL NASR) 3000 ML     | Purified Water           | None                           | unspecified            | 0
+ 92 CELEBREX 200MG 15 CAPS.                            | Celecoxib                | 200 mg                         | capsule                | 1
+ 93 BIOROSUVIN 20 MG 28 F.C. TABS.                     | Rosuvastatin             | 20 mg                          | tablet                 | 1
+ 94 CLARIVEE 250 ML                                    | Thyme. Tea Tree Oil. Mal | None                           | unspecified            | 0
+ 95 TOBRACOID EYE DROPS 5 ML                           | Dexamethasone + Tobramyc | None                           | eye drops              | 0
+ 96 ROZVI VER HAIR OIL 150ML                           | Olive Oil + Caffeine + R | None                           | unspecified            | 0
+ 97 VITA-3  3 DOUBLE AMP. (N/A)                        | Vitamin B1 + Vitamin B6  | None                           | injection              | 0
+ 98 KAPRON 500 MG 20 F.C.TABS.                         | Tranexamic Acid          | 500 mg                         | tablet                 | 1
+ 99 SUPRANEM 500/500 MG VIAL FOR I.V. INF.             | Cilastatin + Imipenem    | 500 mg / 500 mg (as on the pac | injection              | 1
+100 EFEXOR XR 75MG 14 CAPS.                            | Venlafaxine              | 75 mg                          | capsule (extended release) | 1

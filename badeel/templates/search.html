@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% from "_macros.html" import strip, search_box, drug_name, availability with context %}
+{% block title %}{{ q or _('Search', 'بحث') }}{% endblock %}
+{% block content %}
+{{ search_box(q) }}
+{% if q %}
+  {% if results %}
+  <h1 class="page-h">{{ _('Results for “%s”', 'نتائج البحث عن «%s»') | format(q) }}</h1>
+  <p class="muted">{{ _('Choose the product you were prescribed to see its alternatives.', 'اختر الدواء المكتوب لك لعرض بدائله.') }}</p>
+  <ul class="rows">
+    {% for d in results %}
+    <li class="row">
+      <div class="row-head">
+        <a class="row-name" href="{{ url_for('public.drug', drug_id=d.id) }}">{{ drug_name(d) }}</a>
+        <span class="row-meta">
+          {{ availability(d) }}
+          <span class="price">{{ money(d.price) }}</span>
+          {% if d.alt_count %}<span class="badge match">{{ _('%s exact alternatives', '%s بديل مطابق') | format(d.alt_count) }}</span>
+          {% else %}<span class="badge">{{ _('No exact alternative', 'لا يوجد بديل مطابق') }}</span>{% endif %}
+        </span>
+      </div>
+      {{ strip(d) }}
+    </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <section class="empty">
+    <h1>{{ _('Nothing matches “%s”', 'لا توجد نتائج لـ «%s»') | format(q) }}</h1>
+    <p>{{ _('Try the active ingredient instead of the brand name, or fewer letters.', 'جرّب اسم المادة الفعالة بدل الاسم التجاري، أو اكتب حروفًا أقل.') }}</p>
+  </section>
+  {% endif %}
+{% endif %}
+{% endblock %}

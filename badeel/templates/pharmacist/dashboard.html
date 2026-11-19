@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% from "_macros.html" import strip, drug_name, search_box with context %}
+{% block title %}{{ _('Shortages', 'النواقص') }}{% endblock %}
+{% block content %}
+<h1 class="page-h">{{ _('Products reported as shortage', 'الأدوية المسجلة كنواقص') }}</h1>
+<p class="muted">{{ _('To report a shortage or a new price, open the product page and use the update form at the bottom.', 'لتسجيل نقص أو سعر جديد افتح صفحة الدواء واستخدم نموذج التحديث في آخر الصفحة.') }}</p>
+{{ search_box() }}
+{% if shortages %}
+<table class="table">
+  <thead><tr>
+    <th>{{ _('Product', 'الدواء') }}</th><th>{{ _('Composition', 'التركيبة') }}</th>
+    <th>{{ _('Alternatives not in shortage', 'بدائل غير ناقصة') }}</th><th>{{ _('Reported (UTC)', 'وقت التسجيل (UTC)') }}</th>
+  </tr></thead>
+  <tbody>
+  {% for d in shortages %}
+    <tr>
+      <td><a href="{{ url_for('public.drug', drug_id=d.id) }}">{{ drug_name(d) }}</a></td>
+      <td dir="ltr">{{ d.ingredients_display }} {{ d.strength_display or '' }}</td>
+      <td>{% if d.alt_count %}<span class="badge match">{{ d.alt_count }}</span>{% else %}<span class="badge bad">{{ _('None', 'لا يوجد') }}</span>{% endif %}</td>
+      <td dir="ltr">{{ d.updated_at }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<section class="empty"><p>{{ _('No product is marked as shortage right now.', 'لا يوجد دواء مسجل كناقص حاليًا.') }}</p></section>
+{% endif %}
+{% endblock %}

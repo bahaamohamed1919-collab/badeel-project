@@ -1,0 +1,49 @@
+"""Pharmacist tools: report shortages and update prices from the counter."""
+from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
+
+from .. import db, security
+
+bp = Blueprint("pharmacist", __name__)
+
+
+def tr(en, ar):
+    return ar if g.lang == "ar" else en
+
+
+@bp.route("/pharmacist")
+@security.role_required("pharmacist", "admin")
+def dashboard():
+    shortages = db.query(
+        "SELECT d.*, (SELECT COUNT(*) FROM drugs x WHERE x.composition_key = d.composition_key "
+        "AND x.form = d.form AND x.id != d.id AND x.availability != 'shortage' "
+        "AND d.strength_known = 1) AS alt_count "
+        "FROM drugs d WHERE d.availability = 'shortage' ORDER BY d.updated_at DESC LIMIT 200")
+    return render_template("pharmacist/dashboard.html", shortages=shortages)
+
+
+@bp.route("/drug/<int:drug_id>/status", methods=["POST"])
+@security.role_required("pharmacist", "admin")
+def update_status(drug_id):
+    d = db.one("SELECT * FROM drugs WHERE id = ?", (drug_id,))
+    if not d:
+        abort(404)
+    availability = request.form.get("availability")
+    price_text = request.form.get("price", "").strip()
+    if availability not in ("available", "shortage", "unknown"):
+        abort(400)
+    try:
+        price = float(price_text) if price_text else None
+        if price is not None and not 0 <= price < 1_000_000:
+            raise ValueError
+    except ValueError:
+        flash(tr("Price must be a positive number.", "السعر يجب أن يكون رقمًا موجبًا."), "error")
+        return redirect(url_for("public.drug", drug_id=drug_id))
+
+    db.execute("UPDATE drugs SET availability = ?, price = ?, updated_at = ? WHERE id = ?",
+               (availability, price, db.now(), drug_id))
+    security.audit("drug_status",
+                   f"{d['trade_name']} (#{drug_id}): {d['availability']} -> {availability}, "
+                   f"price {d['price']} -> {price}")
+    db.commit()
+    flash(tr("Availability and price updated.", "تم تحديث التوافر والسعر."), "success")
+    return redirect(url_for("public.drug", drug_id=drug_id))

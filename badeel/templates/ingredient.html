@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "_macros.html" import strip, drug_row, drug_name, availability with context %}
+{% block title %}{{ name }}{% endblock %}
+{% block content %}
+<h1 class="page-h">{{ _('Products containing', 'الأدوية التي تحتوي') }} <span dir="ltr">{{ name }}</span></h1>
+<p class="muted">{{ _('Grouped by form and strength. Products in the same group with the same ingredients are exact alternatives.', 'مرتبة حسب الشكل والتركيز. الأدوية المتطابقة في المكونات داخل نفس المجموعة بدائل مطابقة.') }}</p>
+<ul class="rows">{% for d in drugs %}{{ drug_row(d) }}{% endfor %}</ul>
+{% endblock %}

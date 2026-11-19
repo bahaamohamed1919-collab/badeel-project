@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% from "_macros.html" import strip, drug_row, drug_name, availability, csrf with context %}
+{% block title %}{{ d.trade_name }}{% endblock %}
+{% block content %}
+<article>
+  <header class="drug-head">
+    <div>
+      <h1>{{ drug_name(d) }}</h1>
+      <p class="drug-sub">
+        {{ availability(d) }}
+        <span class="price big">{{ money(d.price) }}</span>
+        {% if d.pack_count and d.price %}<span class="muted">{{ _('%s units, %s each', '%s وحدة، %s للوحدة') | format(d.pack_count, money(d.price / d.pack_count)) }}</span>{% endif %}
+        {% if d.company %}<span class="muted">{{ d.company }}</span>{% endif %}
+        {% if d.drug_class %}<span class="muted" dir="ltr">{{ d.drug_class }}</span>{% endif %}
+      </p>
+    </div>
+    {% if user %}
+    <form method="post" action="{{ url_for('account.toggle_favorite', drug_id=d.id) }}">
+      {{ csrf() }}
+      <button class="btn ghost" type="submit">{{ _('Remove from saved', 'إزالة من المحفوظات') if is_favorite else _('Save this medicine', 'حفظ هذا الدواء') }}</button>
+    </form>
+    {% endif %}
+  </header>
+
+  {{ strip(d) }}
+  <p class="ing-links">
+    {{ _('All products containing:', 'كل الأدوية التي تحتوي:') }}
+    {% for i in ingredients %}<a href="{{ url_for('public.ingredient', ingredient_id=i.id) }}" dir="ltr">{{ display_name(i.name) }}</a>{% endfor %}
+  </p>
+
+  {% if allergy_hits %}
+  <div class="alert danger" role="alert">
+    <strong>{{ _('Allergy warning', 'تحذير حساسية') }}</strong>
+    {{ _('This product and all its alternatives contain %s, which is on your allergy list.', 'هذا الدواء وكل بدائله تحتوي %s وهي مسجلة في قائمة الحساسية عندك.') | format(allergy_hits | join(', ')) }}
+  </div>
+  {% endif %}
+  {% if not d.strength_known %}
+  <div class="alert warn">{{ _('The strength of this product is not recorded, so no product can be confirmed as an exact alternative.', 'تركيز هذا الدواء غير مسجل، لذلك لا يمكن تأكيد أي بديل مطابق له.') }}</div>
+  {% endif %}
+
+  <section class="block" aria-labelledby="h-exact">
+    <h2 id="h-exact">{{ _('Exact alternatives', 'البدائل المطابقة') }} <span class="count">{{ alt.exact | length }}</span></h2>
+    <p class="muted">{{ _('Same active ingredient, same strength, same form. Available products first, then the lowest price per unit (per tablet, capsule or ampoule) when the pack size is known.', 'نفس المادة الفعالة ونفس التركيز ونفس الشكل. المتوفر أولًا، ثم الأرخص سعرًا للوحدة (القرص أو الكبسولة أو الأمبول) لما يكون حجم العلبة معروف.') }}</p>
+    {% if alt.exact %}
+    <ul class="rows">{% for a in alt.exact %}{{ drug_row(a) }}{% endfor %}</ul>
+    {% else %}
+    <p class="none">{{ _('No other product in the database has exactly this composition.', 'لا يوجد في قاعدة البيانات دواء آخر بنفس هذه التركيبة تمامًا.') }}</p>
+    {% endif %}
+  </section>
+
+  {% if alt.related %}
+  <section class="block" aria-labelledby="h-rel">
+    <h2 id="h-rel">{{ _('Same ingredient, different strength or form', 'نفس المادة الفعالة بتركيز أو شكل مختلف') }} <span class="count">{{ alt.related | length }}</span></h2>
+    <div class="alert warn">{{ _('These are not direct substitutes. The dose changes, so a pharmacist or doctor must decide. The part that differs is highlighted.', 'هذه ليست بدائل مباشرة. الجرعة تختلف ولا بد أن يحددها الصيدلي أو الطبيب. الجزء المختلف مميز باللون.') }}</div>
+    <ul class="rows">{% for a in alt.related %}{{ drug_row(a, d) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  {% if alt.same_class %}
+  <section class="block" aria-labelledby="h-class">
+    <h2 id="h-class">{{ _('Different medicine from the same class', 'دواء مختلف من نفس المجموعة العلاجية') }}</h2>
+    <div class="alert warn">{{ _('A different active ingredient. Only a doctor can switch you to one of these.', 'مادة فعالة مختلفة. الطبيب فقط هو من يقرر التحويل إلى أحدها.') }}</div>
+    <ul class="rows compact">{% for a in alt.same_class %}{{ drug_row(a, d) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  {% if user and user.role in ('pharmacist', 'admin') %}
+  <section class="block panel" aria-labelledby="h-ph">
+    <h2 id="h-ph">{{ _('Update availability and price', 'تحديث التوافر والسعر') }}</h2>
+    <form class="inline-form" method="post" action="{{ url_for('pharmacist.update_status', drug_id=d.id) }}">
+      {{ csrf() }}
+      <label>{{ _('Availability', 'التوافر') }}
+        <select name="availability">
+          <option value="available" {{ 'selected' if d.availability == 'available' }}>{{ _('Available', 'متوفر') }}</option>
+          <option value="shortage" {{ 'selected' if d.availability == 'shortage' }}>{{ _('Shortage', 'ناقص') }}</option>
+          <option value="unknown" {{ 'selected' if d.availability == 'unknown' }}>{{ _('Unknown', 'غير معروف') }}</option>
+        </select>
+      </label>
+      <label>{{ _('Price', 'السعر') }}
+        <input name="price" type="number" min="0" step="0.01" value="{{ '' if d.price is none else d.price }}">
+      </label>
+      <button class="btn" type="submit">{{ _('Save update', 'حفظ التحديث') }}</button>
+      {% if user.role == 'admin' %}<a class="btn ghost" href="{{ url_for('admin.drug_edit', drug_id=d.id) }}">{{ _('Edit all details', 'تعديل كل البيانات') }}</a>{% endif %}
+    </form>
+  </section>
+  {% endif %}
+</article>
+{% endblock %}

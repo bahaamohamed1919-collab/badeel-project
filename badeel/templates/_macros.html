@@ -1,0 +1,61 @@
+{# Reusable pieces. Import with:  {% from "_macros.html" import ... with context %} #}
+
+{# The three facts that decide a match, shown the same way everywhere. #}
+{% macro strip(d, base=None) %}
+<div class="strip">
+  <div class="slot{% if base and d.ingredient_key != base.ingredient_key %} differs{% endif %}">
+    <span class="slot-cap">{{ _('Active ingredient', 'المادة الفعالة') }}</span>
+    <span class="slot-val" dir="ltr">{{ d.ingredients_display }}</span>
+  </div>
+  <div class="slot{% if base and d.composition_key != base.composition_key %} differs{% endif %}">
+    <span class="slot-cap">{{ _('Strength', 'التركيز') }}</span>
+    <span class="slot-val" dir="ltr">{{ d.strength_display or _('Not recorded', 'غير مسجل') }}</span>
+  </div>
+  <div class="slot{% if base and d.form != base.form %} differs{% endif %}">
+    <span class="slot-cap">{{ _('Form', 'الشكل') }}</span>
+    <span class="slot-val">{{ form_label(d.form) }}</span>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro availability(d) %}
+  {% if d.availability == 'available' %}<span class="badge ok">{{ _('Available', 'متوفر') }}</span>
+  {% elif d.availability == 'shortage' %}<span class="badge bad">{{ _('Shortage', 'ناقص') }}</span>
+  {% else %}<span class="badge">{{ _('Availability unknown', 'التوافر غير معروف') }}</span>{% endif %}
+{% endmacro %}
+
+{% macro drug_name(d) %}
+  {% if lang == 'ar' and d.trade_name_ar %}{{ d.trade_name_ar }} <span class="alt-name" dir="ltr">{{ d.trade_name }}</span>
+  {% else %}<span dir="ltr">{{ d.trade_name }}</span>{% if d.trade_name_ar %} <span class="alt-name">{{ d.trade_name_ar }}</span>{% endif %}{% endif %}
+{% endmacro %}
+
+{% macro drug_row(d, base=None) %}
+<li class="row">
+  <div class="row-head">
+    <a class="row-name" href="{{ url_for('public.drug', drug_id=d.id) }}">{{ drug_name(d) }}</a>
+    <span class="row-meta">
+      {{ availability(d) }}
+      <span class="price">{{ money(d.price) }}</span>
+      {% if d.pack_count and d.price %}<span class="muted unit">{{ _('%s units, %s each', '%s وحدة، %s للوحدة') | format(d.pack_count, money(d.price / d.pack_count)) }}</span>{% endif %}
+      {% if d.saving %}<span class="badge save">{{ (_('%s%% cheaper per unit', 'أرخص %s%% للوحدة') if d.saving_per_unit else _('%s%% cheaper', 'أرخص %s%%')) | format(d.saving) }}</span>{% endif %}
+    </span>
+  </div>
+  {{ strip(d, base) }}
+  {% if d.company %}<p class="row-co">{{ d.company }}</p>{% endif %}
+</li>
+{% endmacro %}
+
+{% macro search_box(q='', autofocus=False) %}
+<form class="search" action="{{ url_for('public.search') }}" method="get" role="search" autocomplete="off">
+  <label class="sr" for="q">{{ _('Drug name or active ingredient', 'اسم الدواء أو المادة الفعالة') }}</label>
+  <div class="search-field">
+    <input id="q" name="q" type="search" value="{{ q }}" maxlength="100" required
+           placeholder="{{ _('Drug name or active ingredient', 'اسم الدواء أو المادة الفعالة') }}"
+           data-suggest="{{ url_for('public.suggest') }}" {% if autofocus %}autofocus{% endif %}>
+    <ul class="suggest" id="suggest" hidden></ul>
+  </div>
+  <button class="btn" type="submit">{{ _('Find alternatives', 'ابحث عن البدائل') }}</button>
+</form>
+{% endmacro %}
+
+{% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}

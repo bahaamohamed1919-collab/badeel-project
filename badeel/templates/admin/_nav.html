@@ -1,0 +1,9 @@
+<nav class="subnav" aria-label="{{ _('Admin', 'لوحة التحكم') }}">
+  {% set here = request.endpoint %}
+  <a href="{{ url_for('admin.dashboard') }}" {{ 'aria-current=page' if here == 'admin.dashboard' }}>{{ _('Overview', 'نظرة عامة') }}</a>
+  <a href="{{ url_for('admin.drugs') }}" {{ 'aria-current=page' if here in ('admin.drugs', 'admin.drug_new', 'admin.drug_edit') }}>{{ _('Drugs', 'الأدوية') }}</a>
+  <a href="{{ url_for('admin.import_data') }}" {{ 'aria-current=page' if here == 'admin.import_data' }}>{{ _('Import data', 'استيراد البيانات') }}</a>
+  <a href="{{ url_for('admin.users') }}" {{ 'aria-current=page' if here == 'admin.users' }}>{{ _('Users', 'المستخدمون') }}</a>
+  <a href="{{ url_for('admin.security_log') }}" {{ 'aria-current=page' if here == 'admin.security_log' }}>{{ _('Security log', 'سجل الأمان') }}</a>
+  <a href="{{ url_for('admin.audit_log') }}" {{ 'aria-current=page' if here == 'admin.audit_log' }}>{{ _('Change log', 'سجل التغييرات') }}</a>
+</nav>

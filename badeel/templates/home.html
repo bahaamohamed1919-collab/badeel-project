@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% from "_macros.html" import strip, search_box, drug_name, availability with context %}
+{% block content %}
+<section class="hero">
+  <h1>{{ _('The medicine is out of stock. Which one is exactly the same?', 'الدواء ناقص. أي دواء آخر مطابق له تمامًا؟') }}</h1>
+  <p class="lead">{{ _('Type the name on the box. Badeel lists every product with the same active ingredient, the same strength and the same form, cheapest first.', 'اكتب الاسم المكتوب على العلبة، وبديل يعرض لك كل الأدوية التي لها نفس المادة الفعالة ونفس التركيز ونفس الشكل، مرتبة من الأرخص.') }}</p>
+  {{ search_box(autofocus=True) }}
+  {% if stats.drugs %}
+  <p class="hint">{{ _('%s products and %s active ingredients in the database. Spelling mistakes are fine.', 'في قاعدة البيانات %s دواء و%s مادة فعالة. البحث يتحمل الأخطاء الإملائية.') | format(stats.drugs, stats.ingredients) }}</p>
+  {% endif %}
+</section>
+
+{% if not stats.drugs %}
+<section class="empty">
+  <h2>{{ _('The database has no drugs yet', 'قاعدة البيانات لا تحتوي أدوية بعد') }}</h2>
+  <p>{{ _('An admin can upload a CSV file from Admin, then Import data.', 'يستطيع الأدمن رفع ملف CSV من لوحة التحكم ثم «استيراد البيانات».') }}</p>
+</section>
+{% elif example | length > 1 %}
+<section class="example" aria-labelledby="ex-h">
+  <h2 id="ex-h">{{ _('What counts as a match', 'ما المقصود بالمطابقة') }}</h2>
+  <p>{{ _('Three things must be identical. A different brand name and a different price do not matter.', 'ثلاثة أشياء يجب أن تتطابق. اختلاف الاسم التجاري والسعر لا يهم.') }}</p>
+  <div class="pair">
+    {% for d in example[:2] %}
+    <a class="pair-item" href="{{ url_for('public.drug', drug_id=d.id) }}">
+      <span class="pair-name">{{ drug_name(d) }}</span>
+      <span class="price">{{ money(d.price) }}</span>
+      {{ strip(d) }}
+    </a>
+    {% if loop.first %}<span class="pair-eq" aria-hidden="true">=</span>{% endif %}
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section class="who">
+  <h2>{{ _('What you can do here', 'ماذا يمكنك أن تفعل هنا') }}</h2>
+  <dl class="who-list">
+    <div><dt>{{ _('Patients', 'المريض') }}</dt><dd>{{ _('Find a cheaper or available match, save medicines you take regularly, and get a warning when a product contains something you are allergic to.', 'ابحث عن بديل متوفر أو أرخص، احفظ أدويتك الدائمة، واحصل على تحذير إذا كان الدواء يحتوي مادة عندك حساسية منها.') }}</dd></div>
+    <div><dt>{{ _('Pharmacists', 'الصيدلي') }}</dt><dd>{{ _('Mark a product as in shortage and update its price so everyone sees the current situation.', 'سجّل أن الدواء ناقص وحدّث سعره ليرى الجميع الوضع الحالي.') }}</dd></div>
+    <div><dt>{{ _('Admins', 'الأدمن') }}</dt><dd>{{ _('Upload the drug list, approve pharmacists, and watch the security log.', 'ارفع قائمة الأدوية، وافق على حسابات الصيادلة، وراقب سجل الأمان.') }}</dd></div>
+  </dl>
+</section>
+{% endblock %}

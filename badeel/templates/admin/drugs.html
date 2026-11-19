@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, availability with context %}
+{% block title %}{{ _('Drugs', 'الأدوية') }}{% endblock %}
+{% block content %}
+{% include "admin/_nav.html" %}
+<div class="head-row">
+  <h1 class="page-h">{{ _('Drugs', 'الأدوية') }} <span class="count">{{ total }}</span></h1>
+  <a class="btn" href="{{ url_for('admin.drug_new') }}">{{ _('Add a drug', 'إضافة دواء') }}</a>
+</div>
+<form class="filter" method="get">
+  <label class="sr" for="fq">{{ _('Filter', 'تصفية') }}</label>
+  <input id="fq" name="q" type="search" value="{{ q }}" placeholder="{{ _('Name, ingredient or company', 'الاسم أو المادة أو الشركة') }}">
+  <button class="btn ghost" type="submit">{{ _('Filter', 'تصفية') }}</button>
+</form>
+{% if rows %}
+<div class="table-scroll">
+<table class="table">
+  <thead><tr>
+    <th>{{ _('Name', 'الاسم') }}</th><th>{{ _('Composition', 'التركيبة') }}</th><th>{{ _('Form', 'الشكل') }}</th>
+    <th>{{ _('Price', 'السعر') }}</th><th>{{ _('Availability', 'التوافر') }}</th><th><span class="sr">{{ _('Actions', 'إجراءات') }}</span></th>
+  </tr></thead>
+  <tbody>
+  {% for d in rows %}
+    <tr>
+      <td><a href="{{ url_for('public.drug', drug_id=d.id) }}" dir="ltr">{{ d.trade_name }}</a>{% if d.trade_name_ar %}<br><span class="muted">{{ d.trade_name_ar }}</span>{% endif %}</td>
+      <td dir="ltr">{{ d.ingredients_display }}<br><span class="muted">{{ d.strength_display or '?' }}</span></td>
+      <td>{{ form_label(d.form) }}</td>
+      <td class="num">{{ money(d.price) }}</td>
+      <td>{{ availability(d) }}</td>
+      <td class="actions">
+        <a href="{{ url_for('admin.drug_edit', drug_id=d.id) }}">{{ _('Edit', 'تعديل') }}</a>
+        <form method="post" action="{{ url_for('admin.drug_delete', drug_id=d.id) }}" data-confirm="{{ _('Delete %s? This cannot be undone.', 'حذف %s؟ لا يمكن التراجع.') | format(d.trade_name) }}">
+          {{ csrf() }}<button class="linklike danger" type="submit">{{ _('Delete', 'حذف') }}</button>
+        </form>
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+</div>
+{% if pages > 1 %}
+<nav class="pager" aria-label="{{ _('Pages', 'الصفحات') }}">
+  {% if page > 1 %}<a href="{{ url_for('admin.drugs', q=q, page=page - 1) }}">{{ _('Previous', 'السابق') }}</a>{% endif %}
+  <span>{{ _('Page %s of %s', 'صفحة %s من %s') | format(page, pages) }}</span>
+  {% if page < pages %}<a href="{{ url_for('admin.drugs', q=q, page=page + 1) }}">{{ _('Next', 'التالي') }}</a>{% endif %}
+</nav>
+{% endif %}
+{% else %}
+<section class="empty"><p>{{ _('No drugs found. Add one, or import a CSV file.', 'لا توجد أدوية. أضف دواء أو استورد ملف CSV.') }}</p></section>
+{% endif %}
+{% endblock %}
