@@ -7,8 +7,8 @@ not allow re-publishing them.
 
 | Source | What Badeel takes from it | Licence | Table |
 |---|---|---|---|
-| DDInter (http://ddinter.scbdd.com/) | Drug-drug interactions with severity (Major, Moderate, Minor, Unknown) | Reported as CC BY-NC-SA 4.0: confirm on the DDInter site before publishing derived data | `drug_interactions` |
-| openFDA drug labels (https://open.fda.gov/data/downloads/) | U.S. package leaflets: indications, dosage, children, older adults, pregnancy, breastfeeding, contraindications, warnings | Public domain (CC0) | `ingredient_labels` |
+| DDInter 2.0 (https://ddinter2.scbdd.com/) | Drug-drug interactions with severity (Major, Moderate, Minor, Unknown) | Reported as CC BY-NC-SA 4.0: confirm on the DDInter site before publishing derived data | `drug_interactions` |
+| openFDA drug labels (index: https://api.fda.gov/download.json) | U.S. package leaflets: indications, dosage, children, older adults, pregnancy, breastfeeding, contraindications, warnings | Public domain (CC0) | `ingredient_labels` |
 
 ## Matching
 

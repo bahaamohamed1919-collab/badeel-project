@@ -16,13 +16,13 @@ from datetime import datetime, timezone
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 RAW_DIR = os.path.join(ROOT, "data", "raw")
 
-DDINTER_URL = "http://ddinter.scbdd.com/static/media/download/"
+DDINTER_URL = "https://ddinter2.scbdd.com/static/media/download/"
 # DDInter publishes one file per ATC first-level code.
 DDINTER_CODES = ["A", "B", "D", "H", "L", "M", "P", "R", "S", "V"]
 DDINTER_LICENCE = ("DDInter (Xiong et al., Nucleic Acids Research). Reported as CC BY-NC-SA 4.0: "
                    "check the licence on the DDInter website before publishing derived data.")
 
-OPENFDA_URL = "https://download.open.fda.gov/download.json"
+OPENFDA_URL = "https://api.fda.gov/download.json"
 OPENFDA_LICENCE = "openFDA drug labels: public domain (CC0), U.S. Food and Drug Administration."
 
 USER_AGENT = "Badeel-academic-project/1.0"
