@@ -1,0 +1,31 @@
+CROSS-CHECK WITH THE EDA OTC LIST (January 2026)
+  Source PDF                         : otc-list-5-1-2026.pdf
+  Products in the drug list          : 22,757
+  Products in the EDA list           : 355
+  Found by exact brand name          : 267 of 355 (75.2%)
+  Found by first word only           : 54 of 355 (15.2%)
+  Not found                          : 34 of 355 (9.6%)
+
+  Exact brand matches (267 products):
+    same active ingredients               : 225 of 267 (84.3%)
+    same, but spelled differently          : 24 of 267 (9.0%)
+    different (to review)                  : 18 of 267 (6.7%)
+    same ingredients incl. spelling        : 249 of 267 (93.3%)
+    strength agrees, same form             : 106 of 123 (86.2%)
+    strength differs, same form (to review): 17 of 123 (13.8%)
+    our product is another form of the brand: 78
+    strength not readable                  : 66
+
+  All matches (321 products):
+    same active ingredients               : 262 of 321 (81.6%)
+    same, but spelled differently          : 28 of 321 (8.7%)
+    different (to review)                  : 31 of 321 (9.7%)
+    same ingredients incl. spelling        : 290 of 321 (90.3%)
+    strength agrees, same form             : 111 of 128 (86.7%)
+    strength differs, same form (to review): 17 of 128 (13.3%)
+    our product is another form of the brand: 101
+    strength not readable                  : 92
+
+  Rows that need a person to review  : 80  (see data/verification/eda_otc_review.csv)
+  These are automatic results: a disagreement can come from the matching or from
+  reading the PDF, not only from the drug list. The review decides which.
