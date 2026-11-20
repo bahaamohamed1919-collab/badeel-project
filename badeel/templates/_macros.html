@@ -45,17 +45,50 @@
 </li>
 {% endmacro %}
 
-{% macro search_box(q='', autofocus=False) %}
+{% macro search_box(q='', autofocus=False, examples=False) %}
+{% from "_icons.html" import icon %}
 <form class="search" action="{{ url_for('public.search') }}" method="get" role="search" autocomplete="off">
   <label class="sr" for="q">{{ _('Drug name or active ingredient', 'اسم الدواء أو المادة الفعالة') }}</label>
   <div class="search-field">
     <input id="q" name="q" type="search" value="{{ q }}" maxlength="100" required
-           placeholder="{{ _('Drug name or active ingredient', 'اسم الدواء أو المادة الفعالة') }}"
+           placeholder="{{ _('Type, say or photograph the medicine name', 'اكتب اسم الدواء، أو قوله، أو صوّره') }}"
            data-suggest="{{ url_for('public.suggest') }}" {% if autofocus %}autofocus{% endif %}>
     <ul class="suggest" id="suggest" hidden></ul>
   </div>
+  {# voice: shown only when the browser supports speech recognition #}
+  <span class="search-tools">
+    <button class="tool voice-lang" type="button" data-voice-lang hidden
+            title="{{ _('Voice language', 'لغة الصوت') }}" aria-label="{{ _('Voice language', 'لغة الصوت') }}">ع</button>
+    <button class="tool voice" type="button" data-voice hidden
+            data-label-listen="{{ _('Listening… say the medicine name', 'بسمعك… قول اسم الدواء') }}"
+            data-label-error="{{ _('Could not hear a name. Try again.', 'مسمعتش اسم. جرّب تاني.') }}"
+            data-label-denied="{{ _('Allow the microphone in the browser to search by voice.', 'اسمح للمتصفح يستخدم المايك عشان تبحث بالصوت.') }}"
+            title="{{ _('Search by voice', 'ابحث بالصوت') }}" aria-label="{{ _('Search by voice', 'ابحث بالصوت') }}">{{ icon('mic') }}</button>
+    {% if photo_enabled %}
+    <label class="tool camera" for="photo-input" title="{{ _('Search by a photo of the box', 'ابحث بصورة العلبة') }}">
+      {{ icon('camera') }}<span class="sr">{{ _('Search by a photo of the box', 'ابحث بصورة العلبة') }}</span>
+    </label>
+    {% endif %}
+  </span>
   <button class="btn" type="submit">{{ _('Find alternatives', 'ابحث عن البدائل') }}</button>
 </form>
+<p class="voice-status" role="status" aria-live="polite" hidden></p>
+{% if photo_enabled %}
+<form id="photo-form" class="photo-form" method="post" action="{{ url_for('public.photo_search') }}" enctype="multipart/form-data">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <input id="photo-input" class="sr" type="file" name="photo" accept="image/jpeg,image/png,image/webp" capture="environment">
+  <button class="btn ghost nojs-only" type="submit">{{ _('Search by this photo', 'ابحث بالصورة دي') }}</button>
+  <p class="photo-status" role="status" aria-live="polite" hidden>{{ _('Reading the photo… this takes a few seconds.', 'بنقرا الصورة… ثواني وهتظهر النتيجة.') }}</p>
+</form>
+{% endif %}
+{% if examples %}
+<div class="examples">
+  <span class="muted">{{ _('Try:', 'جرّب:') }}</span>
+  {% for ex in [_('Brufen 400', 'بروفين 400'), _('Panadol', 'بانادول'), _('Augmentin 1 g', 'أوجمنتين 1 جم'), 'Concor 5', _('Glucophage', 'جلوكوفاج')] %}
+  <a class="chip" href="{{ url_for('public.search', q=ex) }}">{{ ex }}</a>
+  {% endfor %}
+</div>
+{% endif %}
 {% endmacro %}
 
 {% macro csrf() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">{% endmacro %}

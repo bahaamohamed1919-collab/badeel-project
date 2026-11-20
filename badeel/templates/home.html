@@ -6,7 +6,7 @@
   <span class="eyebrow">{{ icon('spark') }}{{ _('Same ingredient · same strength · same form', 'نفس المادة · نفس التركيز · نفس الشكل') }}</span>
   <h1>{{ _('The medicine is out of stock.', 'الدواء ناقص؟') }} <span class="grad-text">{{ _('Which one is exactly the same?', 'لاقي البديل المطابق له تمامًا') }}</span></h1>
   <p class="lead">{{ _('Type the name on the box. Badeel lists every product with the same active ingredient, the same strength and the same form, cheapest first.', 'اكتب الاسم المكتوب على العلبة، وبديل يعرض لك كل الأدوية التي لها نفس المادة الفعالة ونفس التركيز ونفس الشكل، مرتبة من الأرخص.') }}</p>
-  {{ search_box(autofocus=True) }}
+  {{ search_box(autofocus=True, examples=True) }}
   {% if stats.drugs %}
   <p class="hint">{{ _('%s products and %s active ingredients in the database. Spelling mistakes are fine.', 'في قاعدة البيانات %s دواء و%s مادة فعالة. البحث يتحمل الأخطاء الإملائية.') | format(stats.drugs, stats.ingredients) }}</p>
   {% endif %}
