@@ -1,17 +1,43 @@
 // Badeel front-end script. No libraries. The site works without it too;
-// it only adds: search suggestions, confirm dialogs, and the mobile menu.
+// it only adds: the light/dark toggle, closing menus, search suggestions and confirm dialogs.
 (function () {
   "use strict";
 
-  // ---- mobile menu
-  var toggle = document.querySelector(".nav-toggle");
-  var nav = document.getElementById("nav");
-  if (toggle && nav) {
-    toggle.addEventListener("click", function () {
-      var open = nav.classList.toggle("open");
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+  // ---- light / dark mode (the choice is remembered in this browser)
+  var root = document.documentElement;
+  var themeButton = document.querySelector(".theme-toggle");
+  function currentTheme() {
+    var set = root.getAttribute("data-theme");
+    if (set) { return set; }
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  }
+  if (themeButton) {
+    themeButton.setAttribute("aria-pressed", currentTheme() === "light" ? "true" : "false");
+    themeButton.addEventListener("click", function () {
+      var next = currentTheme() === "light" ? "dark" : "light";
+      root.setAttribute("data-theme", next);
+      themeButton.setAttribute("aria-pressed", next === "light" ? "true" : "false");
+      try { window.localStorage.setItem("badeel-theme", next); } catch (e) { /* storage blocked */ }
     });
   }
+
+  // ---- dropdown menus (<details>): close on outside click, Escape, or opening another
+  var dropdowns = document.querySelectorAll("details.dropdown");
+  dropdowns.forEach(function (d) {
+    d.addEventListener("toggle", function () {
+      if (!d.open) { return; }
+      dropdowns.forEach(function (other) { if (other !== d) { other.open = false; } });
+    });
+  });
+  document.addEventListener("click", function (event) {
+    dropdowns.forEach(function (d) { if (d.open && !d.contains(event.target)) { d.open = false; } });
+  });
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") { return; }
+    dropdowns.forEach(function (d) {
+      if (d.open) { d.open = false; d.querySelector("summary").focus(); }
+    });
+  });
 
   // ---- "are you sure?" on dangerous forms (data-confirm="message")
   document.querySelectorAll("form[data-confirm]").forEach(function (form) {

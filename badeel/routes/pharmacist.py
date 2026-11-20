@@ -18,7 +18,16 @@ def dashboard():
         "AND x.form = d.form AND x.id != d.id AND x.availability != 'shortage' "
         "AND d.strength_known = 1) AS alt_count "
         "FROM drugs d WHERE d.availability = 'shortage' ORDER BY d.updated_at DESC LIMIT 200")
-    return render_template("pharmacist/dashboard.html", shortages=shortages)
+    stats = db.one(
+        "SELECT (SELECT COUNT(*) FROM drugs) AS products,"
+        " (SELECT COUNT(*) FROM drugs WHERE availability = 'shortage') AS shortages,"
+        " (SELECT COUNT(*) FROM drugs WHERE availability = 'available') AS available,"
+        " (SELECT COUNT(*) FROM audit_log WHERE user_id = ? AND action = 'drug_status'"
+        "  AND created_at > ?) AS mine_today",
+        (g.user["id"], db.now(-24 * 60)))
+    no_alternative = sum(1 for d in shortages if not d["alt_count"])
+    return render_template("pharmacist/dashboard.html", shortages=shortages, stats=stats,
+                           no_alternative=no_alternative)
 
 
 @bp.route("/drug/<int:drug_id>/status", methods=["POST"])

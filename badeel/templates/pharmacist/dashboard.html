@@ -1,11 +1,33 @@
 {% extends "base.html" %}
 {% from "_macros.html" import strip, drug_name, search_box with context %}
-{% block title %}{{ _('Shortages', 'النواقص') }}{% endblock %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ _('Pharmacist dashboard', 'لوحة الصيدلي') }}{% endblock %}
 {% block content %}
-<h1 class="page-h">{{ _('Products reported as shortage', 'الأدوية المسجلة كنواقص') }}</h1>
-<p class="muted">{{ _('To report a shortage or a new price, open the product page and use the update form at the bottom.', 'لتسجيل نقص أو سعر جديد افتح صفحة الدواء واستخدم نموذج التحديث في آخر الصفحة.') }}</p>
+<header class="dash-head">
+  <div>
+    <h1>{{ _('Pharmacist dashboard', 'لوحة الصيدلي') }}</h1>
+    <p>{{ _('Shortages, prices and alternatives at the counter.', 'النواقص والأسعار والبدائل من على الكاونتر.') }}</p>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat bad"><span class="stat-ic">{{ icon('alert') }}</span>
+    <span class="stat-label">{{ _('Reported as shortage', 'مسجلة كنواقص') }}</span><span class="stat-value">{{ stats.shortages }}</span></div>
+  <div class="stat warn"><span class="stat-ic">{{ icon('box') }}</span>
+    <span class="stat-label">{{ _('Shortages with no alternative', 'نواقص من غير بديل') }}</span><span class="stat-value">{{ no_alternative }}</span></div>
+  <div class="stat"><span class="stat-ic">{{ icon('pill') }}</span>
+    <span class="stat-label">{{ _('Marked available', 'مسجلة متوفرة') }}</span><span class="stat-value">{{ stats.available }}</span></div>
+  <div class="stat violet"><span class="stat-ic">{{ icon('edit') }}</span>
+    <span class="stat-label">{{ _('My updates, last 24 h', 'تحديثاتي آخر 24 ساعة') }}</span><span class="stat-value">{{ stats.mine_today }}</span></div>
+</div>
+
+<h2 class="section-title">{{ icon('edit') }}{{ _('Update a product', 'تحديث دواء') }}</h2>
+<p class="muted">{{ _('Search for the product, open its page, and use the update form at the bottom to report a shortage or a new price.', 'دوّر على الدواء وافتح صفحته، واستخدم نموذج التحديث في آخر الصفحة لتسجيل نقص أو سعر جديد.') }}</p>
 {{ search_box() }}
+
+<h2 class="section-title">{{ icon('alert') }}{{ _('Products reported as shortage', 'الأدوية المسجلة كنواقص') }} <span class="count">{{ shortages | length }}</span></h2>
 {% if shortages %}
+<div class="table-scroll">
 <table class="table">
   <thead><tr>
     <th>{{ _('Product', 'الدواء') }}</th><th>{{ _('Composition', 'التركيبة') }}</th>
@@ -22,6 +44,7 @@
   {% endfor %}
   </tbody>
 </table>
+</div>
 {% else %}
 <section class="empty"><p>{{ _('No product is marked as shortage right now.', 'لا يوجد دواء مسجل كناقص حاليًا.') }}</p></section>
 {% endif %}

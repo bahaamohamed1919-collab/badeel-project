@@ -5,6 +5,10 @@ from .. import db, security
 
 bp = Blueprint("auth", __name__)
 
+# Each role lands on its own dashboard after logging in.
+HOME_BY_ROLE = {"admin": "admin.dashboard", "pharmacist": "pharmacist.dashboard",
+                "patient": "account.dashboard"}
+
 # Verified against when the e-mail does not exist, so the response takes the
 # same time either way and an attacker cannot tell which e-mails are registered.
 _DUMMY_HASH = security.hash_password("not-a-real-password")
@@ -120,7 +124,7 @@ def login():
             security.login_user(user)
             if lang:
                 session["lang"] = lang
-            return redirect(next_url or url_for("public.home"))
+            return redirect(next_url or url_for(HOME_BY_ROLE.get(user["role"], "public.home")))
     return render_template("auth/login.html", email=email, next_url=next_url)
 
 

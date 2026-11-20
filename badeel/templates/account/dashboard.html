@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "_macros.html" import drug_row, search_box with context %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ _('My dashboard', 'لوحتي') }}{% endblock %}
+{% block content %}
+<header class="dash-head">
+  <div>
+    <h1>{{ _('Hello, %s', 'أهلًا يا %s') | format(user.name) }} <span class="grad-text">✦</span></h1>
+    <p>{{ _('Your medicines, the warnings about them, and quick search in one place.', 'أدويتك، والتحذيرات الخاصة بيها، والبحث السريع في مكان واحد.') }}</p>
+  </div>
+</header>
+
+{{ search_box() }}
+
+<div class="stats">
+  <a class="stat" href="{{ url_for('account.favorites') }}">
+    <span class="stat-ic">{{ icon('heart') }}</span>
+    <span class="stat-label">{{ _('Saved medicines', 'أدوية محفوظة') }}</span><span class="stat-value">{{ saved | length }}</span>
+  </a>
+  <a class="stat {{ 'bad' if pair_warnings or condition_warnings else '' }}" href="#warnings">
+    <span class="stat-ic">{{ icon('alert') }}</span>
+    <span class="stat-label">{{ _('Warnings', 'تحذيرات') }}</span><span class="stat-value">{{ pair_warnings | length + condition_warnings | length }}</span>
+  </a>
+  <a class="stat violet" href="{{ url_for('account.profile') }}">
+    <span class="stat-ic">{{ icon('activity') }}</span>
+    <span class="stat-label">{{ _('Conditions saved', 'أمراض مسجلة') }}</span><span class="stat-value">{{ groups | length }}</span>
+  </a>
+  <a class="stat warn" href="{{ url_for('account.profile') }}">
+    <span class="stat-ic">{{ icon('shield') }}</span>
+    <span class="stat-label">{{ _('Allergies saved', 'حساسية مسجلة') }}</span><span class="stat-value">{{ allergy_count }}</span>
+  </a>
+</div>
+
+<section id="warnings" aria-labelledby="h-warn">
+  <h2 class="section-title" id="h-warn">{{ icon('alert') }}{{ _('Warnings about your saved medicines', 'تحذيرات على أدويتك المحفوظة') }}</h2>
+  {% if pair_warnings or condition_warnings %}
+  <ul class="warn-list">
+    {% for w in pair_warnings %}
+    <li>{{ icon('alert') }}<span class="sev sev-{{ w.severity }}">{{ _(*severity_labels[w.severity]) }}</span>
+      <a href="{{ url_for('public.drug', drug_id=w.a.id) }}" dir="ltr">{{ w.a.trade_name }}</a> +
+      <a href="{{ url_for('public.drug', drug_id=w.b.id) }}" dir="ltr">{{ w.b.trade_name }}</a>
+      <span class="muted">{{ _('may interact (DDInter)', 'ممكن يحصل بينهم تداخل (DDInter)') }}</span></li>
+    {% endfor %}
+    {% for w in condition_warnings %}
+    <li>{{ icon('activity') }}<a href="{{ url_for('public.drug', drug_id=w.drug.id) }}" dir="ltr">{{ w.drug.trade_name }}</a>
+      <span class="muted">{{ _('is listed against:', 'مذكور ضمن موانع:') }}</span>
+      <strong>{% for g in w.groups %}{{ _(g.en, g.ar) }}{{ '، ' if lang == 'ar' and not loop.last else (', ' if not loop.last) }}{% endfor %}</strong></li>
+    {% endfor %}
+  </ul>
+  <p class="muted"><small>{{ _('Ask your pharmacist or doctor about these. Sources can list cautions that do not apply to you.', 'اسأل الصيدلي أو الطبيب عنها. المصادر ممكن تذكر تحذيرات مش لازم تنطبق عليك.') }}</small></p>
+  {% elif saved %}
+  <p class="none">{{ _('No warning found between your saved medicines and your saved conditions.', 'مفيش تحذير بين أدويتك المحفوظة والأمراض المسجلة عندك.') }}</p>
+  {% else %}
+  <p class="none">{{ _('Save the medicines you take (button on each drug page) to be warned about interactions.', 'احفظ الأدوية اللي بتاخدها (زرار في صفحة كل دواء) علشان يظهرلك تحذير لو فيه تداخل.') }}</p>
+  {% endif %}
+</section>
+
+{% if saved %}
+<section aria-labelledby="h-saved">
+  <h2 class="section-title" id="h-saved">{{ icon('heart') }}{{ _('My medicines', 'أدويتي') }} <span class="count">{{ saved | length }}</span></h2>
+  <ul class="rows">{% for d in saved[:6] %}{{ drug_row(d) }}{% endfor %}</ul>
+  {% if saved | length > 6 %}<p><a href="{{ url_for('account.favorites') }}">{{ _('See all saved medicines', 'كل الأدوية المحفوظة') }}</a></p>{% endif %}
+</section>
+{% endif %}
+
+<div class="two">
+  <section aria-labelledby="h-recent">
+    <h2 class="section-title" id="h-recent">{{ icon('clock') }}{{ _('Recent searches', 'آخر عمليات البحث') }}</h2>
+    {% if recent %}
+    <div class="recent">{% for r in recent %}<a class="chip" href="{{ url_for('public.search', q=r.query) }}">{{ r.query }}</a>{% endfor %}</div>
+    {% else %}<p class="muted">{{ _('Nothing yet.', 'لسه مفيش.') }}</p>{% endif %}
+  </section>
+  <section aria-labelledby="h-health">
+    <h2 class="section-title" id="h-health">{{ icon('activity') }}{{ _('My conditions', 'أمراضي') }}</h2>
+    {% if groups %}
+    <ul class="cond-list">{% for g in groups %}<li><a href="{{ url_for('public.disease', group=g.key) }}">{{ _(g.en, g.ar) }}</a></li>{% endfor %}</ul>
+    {% else %}<p class="muted">{{ _('None saved. Add them to be warned when a medicine is listed against them.', 'مفيش أمراض مسجلة. ضيفها علشان يظهرلك تحذير لو دواء ممنوع معاها.') }}</p>{% endif %}
+    <p><a class="btn ghost" href="{{ url_for('account.profile') }}">{{ icon('edit') }}<span>{{ _('Edit health profile', 'تعديل الملف الصحي') }}</span></a></p>
+  </section>
+</div>
+{% endblock %}

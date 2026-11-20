@@ -2,13 +2,40 @@
 from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
 
 from .. import db, security
-from ..services import conditions
+from ..services import conditions, interactions
 
 bp = Blueprint("account", __name__)
 
 
 def tr(en, ar):
     return ar if g.lang == "ar" else en
+
+
+@bp.route("/me")
+@security.login_required
+def dashboard():
+    """The patient's home: saved medicines, warnings about them, recent searches."""
+    saved = db.query("SELECT d.* FROM favorites f JOIN drugs d ON d.id = f.drug_id "
+                     "WHERE f.user_id = ? ORDER BY f.created_at DESC", (g.user["id"],))
+    groups = conditions.user_groups(g.user)
+    allergies = [a for a in security.decrypt(g.user["allergies_enc"]).replace("،", ",").split(",")
+                 if a.strip()]
+    # Interactions between the saved medicines, and saved medicines listed against a condition.
+    pair_warnings = []
+    for i, a in enumerate(saved):
+        for b in saved[i + 1:]:
+            hits = interactions.between(interactions.drug_moieties(a), interactions.drug_moieties(b))
+            if hits:
+                pair_warnings.append({"a": a, "b": b, "severity": hits[0]["severity"]})
+    condition_warnings = [{"drug": d, "groups": [w["group"] for w in conditions.warnings_for(d, groups)]}
+                          for d in saved]
+    condition_warnings = [w for w in condition_warnings if w["groups"]]
+    recent = db.query("SELECT query, MAX(created_at) AS at FROM search_history WHERE user_id = ? "
+                      "GROUP BY query ORDER BY at DESC LIMIT 8", (g.user["id"],))
+    return render_template(
+        "account/dashboard.html", saved=saved, recent=recent, groups=[conditions.GROUPS[k] for k in groups],
+        allergy_count=len(allergies), pair_warnings=pair_warnings,
+        condition_warnings=condition_warnings, severity_labels=interactions.SEVERITY_LABELS)
 
 
 @bp.route("/account", methods=["GET", "POST"])
