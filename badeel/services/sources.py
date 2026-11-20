@@ -7,6 +7,7 @@ and the paper can cite exactly what was used.
 The addresses are settings, not constants in the code, because sources move:
     BADEEL_DDINTER_URL   folder that holds ddinter_downloads_code_<X>.csv
     BADEEL_OPENFDA_URL   openFDA download index (download.json)
+    BADEEL_DRUGCENTRAL_URL   DrugCentral database dump (.pgdump, about 1.4 GB)
 """
 import json
 import os
@@ -24,6 +25,10 @@ DDINTER_LICENCE = ("DDInter (Xiong et al., Nucleic Acids Research). Reported as 
 
 OPENFDA_URL = "https://api.fda.gov/download.json"
 OPENFDA_LICENCE = "openFDA drug labels: public domain (CC0), U.S. Food and Drug Administration."
+
+DRUGCENTRAL_URL = ("https://unmtid-dbs.net/download/DrugCentral/2027/db_dump/"
+                   "Drugcentral_2026-09-25.pgdump")
+DRUGCENTRAL_LICENCE = "DrugCentral (University of New Mexico): CC BY-SA 4.0."
 
 USER_AGENT = "Badeel-academic-project/1.0"
 
@@ -80,3 +85,12 @@ def fetch_openfda_labels(index_url=None, raw_dir=RAW_DIR, log=print):
     paths = [download(u, os.path.join(folder, u.rsplit("/", 1)[1]), log) for u in urls]
     _write_source(folder, "openFDA drug labels", [index_url] + urls, OPENFDA_LICENCE)
     return paths
+
+
+def fetch_drugcentral(url=None, raw_dir=RAW_DIR, log=print):
+    """Download the DrugCentral database dump (one file, about 1.4 GB)."""
+    url = url or os.environ.get("BADEEL_DRUGCENTRAL_URL") or DRUGCENTRAL_URL
+    folder = os.path.join(raw_dir, "drugcentral", _today())
+    path = download(url, os.path.join(folder, url.rsplit("/", 1)[1]), log)
+    _write_source(folder, "DrugCentral", [url], DRUGCENTRAL_LICENCE)
+    return [path]

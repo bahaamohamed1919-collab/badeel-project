@@ -34,6 +34,16 @@
     {{ _('This product and all its alternatives contain %s, which is on your allergy list.', 'هذا الدواء وكل بدائله تحتوي %s وهي مسجلة في قائمة الحساسية عندك.') | format(allergy_hits | join(', ')) }}
   </div>
   {% endif %}
+  {% if condition_warnings %}
+  <div class="alert danger" role="alert" id="condition-warning">
+    <strong>{{ _('Condition warning', 'تحذير بسبب حالتك الصحية') }}</strong>
+    {{ _('The source lists a condition you saved among the contraindications or cautions of this active ingredient:', 'المصدر بيذكر حالة مسجلة عندك ضمن موانع أو تحذيرات المادة الفعالة دي:') }}
+    <ul class="interaction-list">
+      {% for w in condition_warnings %}<li><strong>{{ _(w.group.en, w.group.ar) }}</strong> <span class="muted" dir="ltr">({{ w.concepts | join(', ') }})</span></li>{% endfor %}
+    </ul>
+    <small>{{ _('Source: DrugCentral, which gathers contraindications from many leaflets, including combination products, so not every one applies to this product. Talk to your doctor or pharmacist before using it.', 'المصدر: DrugCentral، وهو بيجمع الموانع من نشرات كتير منها أدوية مركبة، فمش كلها لازم تنطبق على الدواء ده. كلم الطبيب أو الصيدلي قبل ما تستخدمه.') }}</small>
+  </div>
+  {% endif %}
   {% if saved_interactions %}
   <div class="alert danger" role="alert" id="interactions">
     <strong>{{ _('Interaction warning', 'تحذير تداخل دوائي') }}</strong>
@@ -78,6 +88,26 @@
     <h2 id="h-class">{{ _('Different medicine from the same class', 'دواء مختلف من نفس المجموعة العلاجية') }}</h2>
     <div class="alert warn">{{ _('A different active ingredient. Only a doctor can switch you to one of these.', 'مادة فعالة مختلفة. الطبيب فقط هو من يقرر التحويل إلى أحدها.') }}</div>
     <ul class="rows compact">{% for a in alt.same_class %}{{ drug_row(a, d) }}{% endfor %}</ul>
+  </section>
+  {% endif %}
+
+  {% if disease.indication or disease.contraindication %}
+  <section class="block" aria-labelledby="h-uses">
+    <h2 id="h-uses">{{ _('What the active ingredient is used for', 'المادة الفعالة بتعالج إيه') }}</h2>
+    {% if disease.indication %}
+    <ul class="cond-list">
+      {% for c in disease.indication %}<li><a href="{{ url_for('public.disease', group=concept_group[c].key) if c in concept_group else url_for('public.disease', name=c) }}">{{ _(concept_group[c].en, concept_group[c].ar) if c in concept_group else '' }}<span dir="ltr">{{ '' if c in concept_group else c }}</span></a></li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% if disease.contraindication %}
+    <details>
+      <summary>{{ _('Contraindications and cautions listed for the active ingredient (%s)', 'موانع وتحذيرات مذكورة للمادة الفعالة (%s)') | format(disease.contraindication | length) }}</summary>
+      <ul class="cond-list">
+        {% for c in disease.contraindication %}<li>{% if c in concept_group %}{{ _(concept_group[c].en, concept_group[c].ar) }} · {% endif %}<span dir="ltr">{{ c }}</span></li>{% endfor %}
+      </ul>
+    </details>
+    {% endif %}
+    <p class="muted"><small>{{ _('Source: DrugCentral, for the active ingredient (not for this brand). Log in and tick your conditions in your account to be warned.', 'المصدر: DrugCentral، للمادة الفعالة (مش للماركة دي بالذات). سجل الدخول وعلّم على أمراضك في حسابك علشان يظهرلك تحذير.') }}</small></p>
   </section>
   {% endif %}
 

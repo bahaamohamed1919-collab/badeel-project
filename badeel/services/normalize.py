@@ -272,10 +272,10 @@ def moiety_key(name):
     simplified (e.g. 'ferrous sulfate' -> 'ferrous').
     """
     words = canon_ingredient(name).split()
+    # Only trailing words are removed: "sodium chloride" and "potassium
+    # chloride" are different medicines and must not both become "chloride".
     while len(words) > 1 and words[-1] in _SALT_WORDS:
         words.pop()
-    while len(words) > 1 and words[0] in _SALT_WORDS:
-        words.pop(0)
     return ALIASES.get(" ".join(words), " ".join(words))
 
 

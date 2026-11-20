@@ -3,7 +3,7 @@ from flask import (Blueprint, abort, g, jsonify, redirect, render_template, requ
                    session, url_for)
 
 from .. import db, security
-from ..services import interactions, labels, recommender, search as search_service
+from ..services import conditions, interactions, labels, recommender, search as search_service
 from ..services.normalize import canon_ingredient, display_name
 
 bp = Blueprint("public", __name__)
@@ -87,12 +87,16 @@ def drug(drug_id):
     is_favorite = bool(g.user and db.one(
         "SELECT 1 FROM favorites WHERE user_id = ? AND drug_id = ?", (g.user["id"], drug_id)))
     saved_interactions = interactions.with_saved_medicines(d, g.user["id"]) if g.user else []
+    disease = conditions.for_drug(d)
+    condition_warnings = conditions.warnings_for(d, conditions.user_groups(g.user))
     return render_template(
         "drug.html", d=d, alt=alternatives, ingredients=ingredients,
         allergy_hits=[display_name(a) for a in allergy_hits], is_favorite=is_favorite,
         display_name=display_name, leaflet=labels.for_drug(d),
         leaflet_sections=labels.SECTION_LABELS, saved_interactions=saved_interactions,
-        interaction_count=interactions.count_for(d), severity_labels=interactions.SEVERITY_LABELS)
+        interaction_count=interactions.count_for(d), severity_labels=interactions.SEVERITY_LABELS,
+        disease=disease, condition_warnings=condition_warnings,
+        concept_group=conditions.CONCEPT_TO_GROUP)
 
 
 @bp.route("/ingredient/<int:ingredient_id>")
@@ -105,6 +109,22 @@ def ingredient(ingredient_id):
         "WHERE di.ingredient_id = ? ORDER BY d.form, d.strength_display, d.price IS NULL, d.price",
         (ingredient_id,))
     return render_template("ingredient.html", name=display_name(ing["name"]), drugs=drugs)
+
+
+@bp.route("/disease")
+def disease():
+    """Products whose ingredients are listed as treating a disease."""
+    group = conditions.GROUPS.get(request.args.get("group", ""))
+    name = request.args.get("name", "").strip()[:200]
+    if group:
+        concepts, title = group["concepts"], (group["en"], group["ar"])
+    elif name:
+        concepts, title = [name], (name, name)
+    else:
+        abort(404)
+    ingredients, products = conditions.products_treating(concepts)
+    return render_template("disease.html", title=title, concepts=concepts, group=group,
+                           ingredients=[display_name(i) for i in ingredients], drugs=products)
 
 
 @bp.route("/about")

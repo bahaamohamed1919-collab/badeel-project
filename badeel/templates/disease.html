@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "_macros.html" import drug_row with context %}
+{% block title %}{{ _(*title) }}{% endblock %}
+{% block content %}
+<h1 class="page-h">{{ _(*title) }}</h1>
+{% if group %}<p class="muted" dir="ltr">{{ concepts | join(' · ') }}</p>{% endif %}
+<div class="alert warn">{{ _('Active ingredients that DrugCentral lists as treating this condition, and the products that contain them. Only a doctor can decide which one suits you.', 'المواد الفعالة اللي DrugCentral بيقول إنها بتعالج الحالة دي، والأدوية اللي فيها. الطبيب بس هو اللي يقرر أنهي واحد يناسبك.') }}</div>
+{% if ingredients %}
+<h2>{{ _('Active ingredients', 'المواد الفعالة') }} <span class="count">{{ ingredients | length }}</span></h2>
+<ul class="cond-list" dir="ltr">{% for i in ingredients %}<li>{{ i }}</li>{% endfor %}</ul>
+<h2>{{ _('Products', 'الأدوية') }} <span class="count">{{ drugs | length }}</span></h2>
+{% if drugs %}<ul class="rows compact">{% for d in drugs %}{{ drug_row(d) }}{% endfor %}</ul>
+{% else %}<p class="none">{{ _('No product in the database contains these ingredients.', 'مفيش دواء في قاعدة البيانات فيه المواد دي.') }}</p>{% endif %}
+{% else %}
+<p class="none">{{ _('No active ingredient is recorded for this condition.', 'مفيش مادة فعالة مسجلة للحالة دي.') }}</p>
+{% endif %}
+{% endblock %}

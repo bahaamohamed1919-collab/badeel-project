@@ -1,0 +1,25 @@
+DATA ENRICHMENT COVERAGE
+  Products in the database            : 22,757
+  Distinct ingredients (moieties)     : 6,882
+  Distinct ingredient sets            : 8,081
+
+DDInter interactions (loaded 2026-11-19 22:42:33)
+  Interaction pairs stored            : 164,839
+  Ingredients found in DDInter        : 961 of 6,882 (14.0%)
+  Products with at least one          : 16,326 of 22,757 (71.7%)
+
+openFDA leaflets (loaded 2026-11-19 22:44:25)
+  Ingredient sets with a leaflet      : 1,007 of 8,081 (12.5%)
+  Products with a leaflet             : 9,943 of 22,757 (43.7%)
+    single-ingredient products        : 8,804 of 13,168 (66.9%)
+    combination products              : 1,139 of 9,589 (11.9%)
+  Children section, as read by the rules:
+    min_age                           : 98
+    none                              : 604
+    not_established                   : 305
+
+DrugCentral diseases (loaded 2026-11-19 22:42:36)
+  Ingredient-disease rows stored      : 204,823
+  Ingredients found in DrugCentral    : 1,347 of 6,882 (19.6%)
+  Products with a known use           : 18,290 of 22,757 (80.4%)
+  Products with a contraindication    : 16,270 of 22,757 (71.5%)

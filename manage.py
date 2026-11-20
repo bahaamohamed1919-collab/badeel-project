@@ -11,9 +11,10 @@
     python manage.py import-csv FILE      import drugs from a CSV file
     python manage.py import-csv FILE --replace    delete current drugs first
     python manage.py collect-data         download DDInter + openFDA leaflets and load them
-    python manage.py collect-data --source ddinter    only one source (ddinter | labels)
+    python manage.py collect-data --source ddinter    only one source (ddinter | labels | drugcentral)
     python manage.py load-interactions FILE...        load DDInter CSV files downloaded by hand
     python manage.py load-labels FILE...              load openFDA label files downloaded by hand
+    python manage.py load-conditions FILE             load the DrugCentral dump downloaded by hand
     python manage.py enrichment-report    coverage numbers (saved in docs/results/)
 """
 import argparse
@@ -25,7 +26,7 @@ import sys
 from flask import current_app
 
 from badeel import create_app, db, security
-from badeel.services import coverage, importer, interactions, labels, ranker, search, sources
+from badeel.services import conditions, coverage, importer, interactions, labels, ranker, search, sources
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -210,6 +211,16 @@ def _load_labels(paths):
           f"{r['ingredient_sets']:,} ingredient sets of the drug list have a leaflet.")
 
 
+def _load_conditions(paths):
+    r = conditions.load_drugcentral(paths)
+    print(f"DrugCentral: {r['relations']:,} ingredient-disease rows for {r['ingredients']:,} "
+          f"ingredient names and {r['conditions']:,} diseases.")
+
+
+def cmd_load_conditions(args):
+    _load_conditions(args.files)
+
+
 def cmd_collect_data(args):
     """Download the outside sources into data/raw/ and load them."""
     if args.source in ("all", "ddinter"):
@@ -218,6 +229,9 @@ def cmd_collect_data(args):
     if args.source in ("all", "labels"):
         print("openFDA drug labels (package leaflets). About 13 large files: this takes a while.")
         _load_labels(sources.fetch_openfda_labels())
+    if args.source in ("all", "drugcentral"):
+        print("DrugCentral (what each ingredient treats and must not be used with). About 1.4 GB.")
+        _load_conditions(sources.fetch_drugcentral())
     cmd_enrichment_report(args)
 
 
@@ -262,7 +276,7 @@ def main():
     p.add_argument("--replace", action="store_true")
     p.set_defaults(func=cmd_import)
     p = sub.add_parser("collect-data")
-    p.add_argument("--source", choices=["all", "ddinter", "labels"], default="all")
+    p.add_argument("--source", choices=["all", "ddinter", "labels", "drugcentral"], default="all")
     p.set_defaults(func=cmd_collect_data)
     p = sub.add_parser("load-interactions")
     p.add_argument("files", nargs="+")
@@ -270,6 +284,9 @@ def main():
     p = sub.add_parser("load-labels")
     p.add_argument("files", nargs="+")
     p.set_defaults(func=cmd_load_labels)
+    p = sub.add_parser("load-conditions")
+    p.add_argument("files", nargs="+")
+    p.set_defaults(func=cmd_load_conditions)
     sub.add_parser("enrichment-report").set_defaults(func=cmd_enrichment_report)
     args = parser.parse_args()
 

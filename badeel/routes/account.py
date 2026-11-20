@@ -2,6 +2,7 @@
 from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
 
 from .. import db, security
+from ..services import conditions
 
 bp = Blueprint("account", __name__)
 
@@ -18,22 +19,25 @@ def profile():
         if action == "profile":
             name = request.form.get("name", "").strip()[:80]
             allergies = request.form.get("allergies", "").strip()[:500]
+            groups = [k for k in request.form.getlist("conditions") if k in conditions.GROUPS]
+            health = bool(allergies or groups)
             consent = request.form.get("consent") == "yes"
             if len(name) < 2:
                 flash(tr("Enter your name.", "اكتب اسمك."), "error")
-            elif allergies and not consent:
+            elif health and not consent:
                 # Health data is sensitive personal data under Egypt's Law 151/2020:
                 # it is stored only with the patient's explicit consent.
-                flash(tr("Tick the consent box to save your allergies.",
-                         "علّم على خانة الموافقة علشان نحفظ الحساسية."), "error")
+                flash(tr("Tick the consent box to save your allergies and conditions.",
+                         "علّم على خانة الموافقة علشان نحفظ الحساسية والأمراض."), "error")
             else:
-                # Allergies are health data: stored encrypted, readable only by the app.
-                db.execute("UPDATE users SET name = ?, allergies_enc = ?, consent_at = ? "
-                           "WHERE id = ?",
-                           (name, security.encrypt(allergies), db.now() if allergies else None,
-                            g.user["id"]))
-                security.audit("profile_saved", "allergies saved with consent" if allergies
-                               else "allergies cleared")
+                # Allergies and conditions are health data: stored encrypted,
+                # readable only by the app. The audit log never records which ones.
+                db.execute("UPDATE users SET name = ?, allergies_enc = ?, conditions_enc = ?, "
+                           "consent_at = ? WHERE id = ?",
+                           (name, security.encrypt(allergies), conditions.encrypt_groups(groups),
+                            db.now() if health else None, g.user["id"]))
+                security.audit("profile_saved", "health data saved with consent" if health
+                               else "health data cleared")
                 db.commit()
                 flash(tr("Profile saved.", "تم حفظ البيانات."), "success")
         elif action == "password":
@@ -54,7 +58,9 @@ def profile():
                 flash(tr("Password changed.", "تم تغيير كلمة المرور."), "success")
         return redirect(url_for("account.profile"))
     return render_template("account/profile.html",
-                           allergies=security.decrypt(g.user["allergies_enc"]))
+                           allergies=security.decrypt(g.user["allergies_enc"]),
+                           groups=conditions.GROUPS.values(),
+                           chosen=set(conditions.user_groups(g.user)))
 
 
 @bp.route("/favorites")

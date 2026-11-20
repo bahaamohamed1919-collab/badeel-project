@@ -36,3 +36,26 @@ Download the files in a browser and load them by hand:
 
 Re-run both `load-` commands after importing a new drug list: the leaflets
 kept are the ones that match the products in the database.
+
+## DrugCentral (diseases)
+
+| Source | What Badeel takes from it | Licence | Table |
+|---|---|---|---|
+| DrugCentral (https://drugcentral.org/download) | For each active ingredient: diseases it treats (indication) and conditions listed as contraindications | CC BY-SA 4.0 | `ingredient_conditions` |
+
+The dump is a PostgreSQL archive; Badeel reads the two tables it needs
+(`omop_relationship`, `synonyms`) with `pg_restore`, so no PostgreSQL server
+is needed, only the PostgreSQL 16 client tools.
+
+Patients tick simple groups from `data/patient_conditions.csv` ("Liver
+disease"), and each group covers several DrugCentral terms. The Arabic labels
+in that file were written by the project and should be reviewed by a
+pharmacist.
+
+**Known limitation.** DrugCentral attaches contraindications to an
+ingredient from many leaflets, including combination products. For example
+it lists 85 conditions for ibuprofen, among them "Agoraphobia" and "Suicidal
+thoughts", which most likely come from combinations with other medicines.
+The drug page therefore says "contraindications or cautions" and explains
+this. The precision of these warnings must be measured on a sample reviewed
+by a pharmacist before the paper reports them.

@@ -218,3 +218,6 @@ legend { font-weight: 600; padding-inline: .3rem; }
 .leaflet details { border: 1px solid var(--line, #d9dee7); border-radius: var(--radius); padding: .5rem .8rem; margin-bottom: .5rem; background: var(--surface); }
 .leaflet summary { cursor: pointer; font-weight: 600; }
 .leaflet-text { white-space: pre-line; max-height: 22rem; overflow-y: auto; text-align: left; margin: .5rem 0 0; }
+.check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: .25rem .75rem; margin-top: .4rem; }
+.cond-list { display: flex; flex-wrap: wrap; gap: .35rem; list-style: none; padding: 0; margin: .5rem 0; }
+.cond-list li { background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: .1rem .6rem; font-size: .9rem; }

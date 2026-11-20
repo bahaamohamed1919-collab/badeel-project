@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS users (
     status          TEXT    NOT NULL DEFAULT 'active'
                     CHECK (status IN ('active', 'pending', 'disabled')),
     allergies_enc   TEXT,                             -- encrypted (Fernet/AES)
+    conditions_enc  TEXT,                             -- encrypted list of condition groups
     consent_at      TEXT,                             -- explicit consent for health data
     failed_logins   INTEGER NOT NULL DEFAULT 0,
     locked_until    TEXT,
@@ -139,3 +140,14 @@ CREATE TABLE IF NOT EXISTS ingredient_labels (
     pediatric_note      TEXT,                -- 'not_established' | 'min_age' | NULL
     min_age_months      INTEGER
 );
+
+-- Diseases an ingredient treats or must not be used with (DrugCentral).
+CREATE TABLE IF NOT EXISTS ingredient_conditions (
+    ingredient  TEXT NOT NULL,          -- moiety name
+    condition   TEXT NOT NULL,          -- DrugCentral concept name, e.g. "Peptic ulcer"
+    relation    TEXT NOT NULL CHECK (relation IN ('indication', 'contraindication', 'off_label')),
+    umls_cui    TEXT,
+    source      TEXT NOT NULL,
+    PRIMARY KEY (ingredient, condition, relation)
+);
+CREATE INDEX IF NOT EXISTS idx_conditions_condition ON ingredient_conditions (condition, relation);

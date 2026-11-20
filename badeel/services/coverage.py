@@ -26,6 +26,15 @@ def report():
     single = [d for d in drugs if "|" not in keys(d)]
     combo = [d for d in drugs if "|" in keys(d)]
     with_ddi = [d for d in drugs if any(moiety_key(n) in in_ddi for n in d["ingredient_key"].split("|"))]
+    cond_ing = {r["ingredient"] for r in db.query("SELECT DISTINCT ingredient FROM ingredient_conditions")}
+    with_ind = {r["ingredient"] for r in db.query(
+        "SELECT DISTINCT ingredient FROM ingredient_conditions WHERE relation = 'indication'")}
+    with_contra = {r["ingredient"] for r in db.query(
+        "SELECT DISTINCT ingredient FROM ingredient_conditions WHERE relation = 'contraindication'")}
+
+    def any_in(d, group):
+        return any(moiety_key(n) in group for n in d["ingredient_key"].split("|"))
+
     notes = {r["pediatric_note"] or "none": r["n"] for r in db.query(
         "SELECT pediatric_note, COUNT(*) AS n FROM ingredient_labels GROUP BY pediatric_note")}
 
@@ -43,6 +52,11 @@ def report():
         "combo_with_leaflet": sum(keys(d) in label_keys for d in combo),
         "combo": len(combo),
         "pediatric_notes": notes,
+        "condition_rows": db.one("SELECT COUNT(*) AS n FROM ingredient_conditions")["n"],
+        "ingredients_in_drugcentral": len(moieties & cond_ing),
+        "products_with_indication": sum(any_in(d, with_ind) for d in drugs),
+        "products_with_contraindication": sum(any_in(d, with_contra) for d in drugs),
+        "conditions_loaded": db.get_setting("conditions_loaded"),
         "interactions_loaded": db.get_setting("interactions_loaded"),
         "labels_loaded": db.get_setting("labels_loaded"),
     }
@@ -67,6 +81,14 @@ def as_text(r):
         f"    combination products              : {_pct(r['combo_with_leaflet'], r['combo'])}",
         "  Children section, as read by the rules:",
     ]
+    tail = [
+        "",
+        f"DrugCentral diseases (loaded {r['conditions_loaded'] or 'never'})",
+        f"  Ingredient-disease rows stored      : {r['condition_rows']:,}",
+        f"  Ingredients found in DrugCentral    : {_pct(r['ingredients_in_drugcentral'], r['ingredients'])}",
+        f"  Products with a known use           : {_pct(r['products_with_indication'], r['products'])}",
+        f"  Products with a contraindication    : {_pct(r['products_with_contraindication'], r['products'])}",
+    ]
     for note, n in sorted(r["pediatric_notes"].items()):
         lines.append(f"    {note:<32}  : {n:,}")
-    return "\n".join(lines)
+    return "\n".join(lines + tail)
