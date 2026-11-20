@@ -106,9 +106,15 @@ python manage.py export-dataset dataset
 
 ## Known limitations
 
-1. **The Egyptian list's origin is not stated by its publisher.** It has not
-   yet been checked against Egyptian Drug Authority records, and prices change
-   often.
+1. **The Egyptian list's origin is not stated by its publisher.** An automatic
+   cross-check with the EDA's official OTC list (January 2026, 355 products)
+   found 267 products by exact brand name. Of these, 93.3% have the same active
+   ingredients (84.3% spelled the same, 9.0% with spelling differences such as
+   "Phenylepherine"), and 86.2% of the 123 products with the same form and a
+   readable strength have the same strength. The 80 remaining differences and
+   a random sample of 100 products still need a person to check them
+   (`data/verification/`). Prices change often. Details:
+   `docs/results/eda_crosscheck.txt`.
 2. **DrugCentral contraindications are broad.** They are gathered from many
    leaflets, including combination products. For example ibuprofen has 85
    listed conditions, including "Agoraphobia". Their precision for single
