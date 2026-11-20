@@ -17,6 +17,8 @@
     python manage.py load-conditions FILE             load the DrugCentral dump downloaded by hand
     python manage.py enrichment-report    coverage numbers (saved in docs/results/)
     python manage.py export-dataset DIR   write the enriched data as CSV files
+    python manage.py import-enrichment DIR   load interactions, conditions and leaflets from those files
+    python manage.py install-model FILE   use a search model trained elsewhere (search_model.json)
 """
 import argparse
 import getpass
@@ -253,6 +255,30 @@ def cmd_enrichment_report(_args):
     print(f"\nSaved to {os.path.relpath(out, ROOT)}")
 
 
+def cmd_import_enrichment(args):
+    counts = export.import_enrichment(args.dir)
+    print(f"Loaded {counts['interactions']:,} interactions, {counts['conditions']:,} disease rows "
+          f"and {counts['leaflets']:,} leaflets from {args.dir}.")
+
+
+def cmd_install_model(args):
+    import json
+    with open(args.file, encoding="utf-8") as f:
+        data = json.load(f)                   # plain numbers only: never a pickle (no code can run)
+    try:
+        if data.get("features") != ranker.FEATURES:
+            raise ValueError("trained with another feature set")
+        ranker.Model(data)
+    except (ValueError, KeyError, TypeError, AttributeError) as e:
+        sys.exit(f"This file is not a usable Badeel search model: {e}")
+    dest = os.path.join(os.path.dirname(current_app.config["DATABASE"]), "search_model.json")
+    # the model learned typing mistakes, not this list: mark it as matching the current data
+    data["data_version"] = db.get_setting("data_version", "0")
+    with open(dest, "w", encoding="utf-8") as f:
+        json.dump(data, f)
+    print(f"Search model installed ({data.get('drugs', '?')} drugs, trained {data.get('trained_at', '?')}).")
+
+
 def cmd_export_dataset(args):
     counts = export.export(args.dir, os.path.join(ROOT, "data", "patient_conditions.csv"))
     for name, n in counts.items():
@@ -295,6 +321,12 @@ def main():
     p = sub.add_parser("load-conditions")
     p.add_argument("files", nargs="+")
     p.set_defaults(func=cmd_load_conditions)
+    p = sub.add_parser("import-enrichment")
+    p.add_argument("dir")
+    p.set_defaults(func=cmd_import_enrichment)
+    p = sub.add_parser("install-model")
+    p.add_argument("file")
+    p.set_defaults(func=cmd_install_model)
     p = sub.add_parser("export-dataset")
     p.add_argument("dir")
     p.set_defaults(func=cmd_export_dataset)

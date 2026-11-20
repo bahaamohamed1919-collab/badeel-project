@@ -109,6 +109,9 @@
   </div>
 </header>
 
+{% if public_notice %}
+<div class="demo-bar notice-bar"><div class="wrap">{{ icon('info') }} {{ _('Trial version of a graduation project (Egyptian Chinese University). Not medical advice: do not use it to choose or change a medicine, and do not enter real health data.', 'نسخة تجريبية لمشروع تخرج (الجامعة المصرية الصينية). ليست نصيحة طبية: لا تستخدمها لاختيار أو تغيير دواء، ولا تدخل بيانات صحية حقيقية.') }}</div></div>
+{% endif %}
 {% if demo_data %}
 <div class="demo-bar"><div class="wrap">{{ icon('info') }} {{ _('Demo data: names are real but prices and availability are placeholders. Do not use for real decisions.', 'بيانات تجريبية: الأسماء حقيقية لكن الأسعار والتوافر أرقام للتجربة فقط. لا تعتمد عليها.') }}</div></div>
 {% endif %}
