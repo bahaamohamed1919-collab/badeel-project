@@ -1,9 +1,9 @@
 """Pages anyone can open: home, search, drug page, ingredient page, about."""
-from flask import (Blueprint, abort, g, jsonify, redirect, render_template, request,
+from flask import (Blueprint, abort, flash, g, jsonify, redirect, render_template, request,
                    session, url_for)
 
 from .. import db, security
-from ..services import conditions, interactions, labels, recommender, search as search_service
+from ..services import conditions, interactions, labels, ocr, recommender, search as search_service
 from ..services.normalize import canon_ingredient, display_name
 
 bp = Blueprint("public", __name__)
@@ -59,6 +59,44 @@ def search():
                            "VALUES (?, ?, ?)", (g.user["id"], q, db.now()))
                 db.commit()
     return render_template("search.html", q=q, results=results)
+
+
+def _tr(en, ar):
+    return ar if g.get("lang", "ar") == "ar" else en
+
+
+PHOTO_ERRORS = {
+    "empty": ("Choose or take a photo first.", "اختار صورة أو صوّر العلبة الأول."),
+    "too_large": ("The photo is larger than 8 MB.", "الصورة أكبر من 8 ميجا."),
+    "not_image": ("This file is not a photo (JPG, PNG or WEBP).", "الملف ده مش صورة (JPG أو PNG أو WEBP)."),
+    "timeout": ("Reading the photo took too long. Try a closer, clearer photo.",
+                "قراءة الصورة أخدت وقت طويل. جرّب صورة أقرب وأوضح."),
+}
+
+
+@bp.route("/photo-search", methods=["POST"])
+def photo_search():
+    """Search by a photo of the medicine box (text read on the server, photo not kept)."""
+    if not ocr.available():
+        flash(_tr("Search by photo is not available on this server.", "البحث بالصورة مش متاح على السيرفر ده."), "error")
+        return redirect(url_for("public.home"))
+    if not ocr.allowed(security.client_ip()):
+        flash(_tr("Too many photos in a short time. Wait a few minutes.", "صور كتير في وقت قصير. استنى كام دقيقة."), "error")
+        return redirect(url_for("public.home"))
+    f = request.files.get("photo")
+    data = f.read(ocr.MAX_BYTES + 1) if f else b""
+    try:
+        text = ocr.read_text(data)
+    except ocr.PhotoError as e:
+        flash(_tr(*PHOTO_ERRORS[str(e)]), "error")
+        return redirect(url_for("public.home"))
+    best, others = ocr.best_match(text, lambda q, n: search_service.search(q, limit=n))
+    if not best:
+        flash(_tr("No medicine name could be read. Take the photo closer, in good light, with the name facing the camera.",
+                  "مقدرناش نقرا اسم دوا. صوّر العلبة من قريب، في نور كويس، والاسم قدام الكاميرا."), "error")
+        return redirect(url_for("public.home"))
+    results = _fetch_in_order([i for i, _ in search_service.search(best, limit=30)])
+    return render_template("search.html", q=best, results=results, from_photo=True, photo_others=others)
 
 
 @bp.route("/api/suggest")

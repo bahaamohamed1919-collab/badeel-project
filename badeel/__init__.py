@@ -12,6 +12,11 @@ from .services.normalize import form_label
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
+def _photo_enabled():
+    from .services import ocr
+    return ocr.available()
+
+
 def create_app(test_config=None):
     app = Flask(__name__)
     instance = os.environ.get("BADEEL_INSTANCE", os.path.join(ROOT, "instance"))
@@ -74,6 +79,7 @@ def create_app(test_config=None):
             "csrf_token": security.csrf_token, "money": money,
             "form_label": lambda f: form_label(f, g.get("lang", "ar")),
             "demo_data": db.get_setting("demo_data") == "1",
+            "photo_enabled": _photo_enabled(),
             "public_notice": os.environ.get("BADEEL_PUBLIC_NOTICE") == "1" or app.config.get("PUBLIC_NOTICE"),
             "current_path": request.full_path.rstrip("?"),
         }

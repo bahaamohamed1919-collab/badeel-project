@@ -3,6 +3,15 @@
 {% block title %}{{ q or _('Search', 'بحث') }}{% endblock %}
 {% block content %}
 {{ search_box(q) }}
+{% if from_photo %}
+<div class="alert ok photo-read" role="status">
+  <strong>{{ _('Read from your photo:', 'قريناها من الصورة:') }}</strong> <span dir="auto">«{{ q }}»</span>
+  {% if photo_others %}
+  <p class="muted">{{ _('Not the right name? Try another line from the box:', 'مش هو الاسم الصح؟ جرّب سطر تاني من العلبة:') }}</p>
+  <div class="chips">{% for line in photo_others %}<a class="chip" dir="auto" href="{{ url_for('public.search', q=line) }}">{{ line }}</a>{% endfor %}</div>
+  {% endif %}
+</div>
+{% endif %}
 {% if q %}
   {% if results %}
   <h1 class="page-h">{{ _('Results for “%s”', 'نتائج البحث عن «%s»') | format(q) }}</h1>

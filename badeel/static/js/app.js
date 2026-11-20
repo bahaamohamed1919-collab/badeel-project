@@ -52,6 +52,77 @@
     });
   });
 
+  // ---- search by voice (Web Speech API, built into Chrome, Edge and Safari)
+  // Egyptian Arabic (ar-EG) or English (en-US); the choice is remembered.
+  (function () {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var mic = document.querySelector("[data-voice]");
+    var langBtn = document.querySelector("[data-voice-lang]");
+    var field = document.getElementById("q");
+    var status = document.querySelector(".voice-status");
+    if (!SR || !mic || !field) { return; }          // not supported: the buttons stay hidden
+    var lang;
+    try { lang = window.localStorage.getItem("badeel-voice-lang"); } catch (e) { lang = null; }
+    if (lang !== "ar-EG" && lang !== "en-US") { lang = document.documentElement.lang === "ar" ? "ar-EG" : "en-US"; }
+    function showLang() {
+      langBtn.textContent = lang === "ar-EG" ? "ع" : "EN";
+      langBtn.title = lang === "ar-EG" ? "الصوت: عربي مصري (اضغط للإنجليزي)" : "Voice: English (tap for Egyptian Arabic)";
+    }
+    function say(text) { if (status) { status.textContent = text; status.hidden = !text; } }
+    mic.hidden = false;
+    if (langBtn) {
+      langBtn.hidden = false;
+      showLang();
+      langBtn.addEventListener("click", function () {
+        lang = lang === "ar-EG" ? "en-US" : "ar-EG";
+        try { window.localStorage.setItem("badeel-voice-lang", lang); } catch (e) { /* blocked */ }
+        showLang();
+      });
+    }
+    var rec = null;
+    mic.addEventListener("click", function () {
+      if (rec) { rec.stop(); return; }
+      rec = new SR();
+      rec.lang = lang;
+      rec.interimResults = true;
+      rec.maxAlternatives = 1;
+      var heard = "";
+      rec.onstart = function () { mic.classList.add("listening"); mic.setAttribute("aria-pressed", "true"); say(mic.getAttribute("data-label-listen")); };
+      rec.onresult = function (event) {
+        heard = "";
+        for (var i = 0; i < event.results.length; i++) { heard += event.results[i][0].transcript; }
+        field.value = heard.trim();
+      };
+      rec.onerror = function (event) {
+        say(mic.getAttribute(event.error === "not-allowed" || event.error === "service-not-allowed"
+          ? "data-label-denied" : "data-label-error"));
+      };
+      rec.onend = function () {
+        mic.classList.remove("listening");
+        mic.setAttribute("aria-pressed", "false");
+        rec = null;
+        if (heard.trim()) {
+          say("");
+          if (field.form.requestSubmit) { field.form.requestSubmit(); } else { field.form.submit(); }
+        }
+      };
+      try { rec.start(); } catch (e) { rec = null; say(mic.getAttribute("data-label-error")); }
+    });
+  })();
+
+  // ---- search by photo: send the photo as soon as it is chosen or taken
+  (function () {
+    var photo = document.getElementById("photo-input");
+    var form = document.getElementById("photo-form");
+    if (!photo || !form) { return; }
+    photo.addEventListener("change", function () {
+      if (!photo.files || !photo.files.length) { return; }
+      var note = form.querySelector(".photo-status");
+      if (note) { note.hidden = false; }
+      form.submit();
+    });
+  })();
+
   // ---- search suggestions
   var input = document.querySelector("input[data-suggest]");
   var list = document.getElementById("suggest");
