@@ -16,6 +16,7 @@
     python manage.py load-labels FILE...              load openFDA label files downloaded by hand
     python manage.py load-conditions FILE             load the DrugCentral dump downloaded by hand
     python manage.py enrichment-report    coverage numbers (saved in docs/results/)
+    python manage.py export-dataset DIR   write the enriched data as CSV files
 """
 import argparse
 import getpass
@@ -26,7 +27,7 @@ import sys
 from flask import current_app
 
 from badeel import create_app, db, security
-from badeel.services import conditions, coverage, importer, interactions, labels, ranker, search, sources
+from badeel.services import conditions, coverage, export, importer, interactions, labels, ranker, search, sources
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -252,6 +253,13 @@ def cmd_enrichment_report(_args):
     print(f"\nSaved to {os.path.relpath(out, ROOT)}")
 
 
+def cmd_export_dataset(args):
+    counts = export.export(args.dir, os.path.join(ROOT, "data", "patient_conditions.csv"))
+    for name, n in counts.items():
+        size = os.path.getsize(os.path.join(args.dir, name)) / 1e6
+        print(f"  {name:<30} {n:>9,} rows  {size:6.1f} MB")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Badeel management commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -287,6 +295,9 @@ def main():
     p = sub.add_parser("load-conditions")
     p.add_argument("files", nargs="+")
     p.set_defaults(func=cmd_load_conditions)
+    p = sub.add_parser("export-dataset")
+    p.add_argument("dir")
+    p.set_defaults(func=cmd_export_dataset)
     sub.add_parser("enrichment-report").set_defaults(func=cmd_enrichment_report)
     args = parser.parse_args()
 

@@ -145,3 +145,19 @@ class ConditionTests(Base):
     def test_missing_dump_file_reports_error(self):
         with self.app.app_context(), self.assertRaises(Exception):
             conditions.load_drugcentral([os.path.join(self.tmp, "missing.pgdump")])
+
+
+class ExportTests(ConditionTests):
+    def test_export_writes_every_file(self):
+        import csv
+        import tempfile
+        from badeel.services import export
+        with tempfile.TemporaryDirectory() as out, self.app.app_context():
+            counts = export.export(out, os.path.join(os.path.dirname(os.path.dirname(
+                os.path.abspath(__file__))), "data", "patient_conditions.csv"))
+            self.assertEqual(set(counts), set(export.FILES))
+            with open(os.path.join(out, "products.csv"), encoding="utf-8") as f:
+                self.assertEqual(len(list(csv.DictReader(f))), counts["products.csv"])
+            self.assertGreater(counts["products.csv"], 50)
+            self.assertEqual(counts["conditions.csv"], 4)   # ingredients not in products are left out
+            self.assertEqual(counts["patient_condition_groups.csv"], len(conditions.GROUPS))
