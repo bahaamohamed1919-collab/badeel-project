@@ -51,6 +51,8 @@ def init_db():
     columns = {r["name"] for r in query("PRAGMA table_info(users)")}
     if "consent_at" not in columns:
         execute("ALTER TABLE users ADD COLUMN consent_at TEXT")
+    if "conditions_enc" not in columns:
+        execute("ALTER TABLE users ADD COLUMN conditions_enc TEXT")
     if "pack_count" not in {r["name"] for r in query("PRAGMA table_info(drugs)")}:
         execute("ALTER TABLE drugs ADD COLUMN pack_count INTEGER")
     commit()

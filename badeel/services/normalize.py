@@ -248,3 +248,37 @@ def form_label(form, lang="en"):
 
 def display_name(name):
     return " ".join(w.capitalize() for w in name.split())
+
+
+# ------------------------------------------------------- external sources
+# Salt and hydrate words that do not change which medicine it is when we look
+# up interactions or a package leaflet. They are only removed for matching
+# with outside sources; the exact-alternative rule still keeps salts apart.
+_SALT_WORDS = {
+    "sodium", "potassium", "calcium", "magnesium", "hydrochloride", "hcl",
+    "hydrobromide", "sulfate", "sulphate", "maleate", "mesylate", "besylate",
+    "besilate", "citrate", "phosphate", "succinate", "tartrate", "fumarate",
+    "acetate", "hyclate", "monohydrate", "dihydrate", "trihydrate", "anhydrous",
+    "bromide", "nitrate", "lactate", "gluconate", "dipropionate", "propionate",
+}
+
+
+def moiety_key(name):
+    """Name used to match Badeel ingredients with outside data sources.
+
+    'Diclofenac Sodium' and 'DICLOFENAC POTASSIUM' both give 'diclofenac';
+    'Amoxicillin trihydrate' gives 'amoxicillin'. Both sides of a match go
+    through this same function, so they agree even when the chemistry is
+    simplified (e.g. 'ferrous sulfate' -> 'ferrous').
+    """
+    words = canon_ingredient(name).split()
+    # Only trailing words are removed: "sodium chloride" and "potassium
+    # chloride" are different medicines and must not both become "chloride".
+    while len(words) > 1 and words[-1] in _SALT_WORDS:
+        words.pop()
+    return ALIASES.get(" ".join(words), " ".join(words))
+
+
+def moiety_set_key(names):
+    """'amoxicillin|clavulanic acid' style key built from moiety names."""
+    return "|".join(sorted({moiety_key(n) for n in names if n and n.strip()}))

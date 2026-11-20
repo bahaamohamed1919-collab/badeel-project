@@ -7,3 +7,6 @@ venv/
 .env
 .vscode/
 .DS_Store
+
+# downloaded outside sources (large, and some licences forbid re-publishing)
+data/raw/

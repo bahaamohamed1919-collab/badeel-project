@@ -1,0 +1,35 @@
+key,label_en,label_ar,concepts
+pregnancy,Pregnancy,حمل,"Pregnancy, function"
+breastfeeding,Breastfeeding,رضاعة طبيعية,Breastfeeding (mother)
+liver,Liver disease,أمراض الكبد,Disease of liver;Hepatic failure;Cirrhosis of liver;Liver function tests abnormal;Hepatic coma
+kidney,Kidney disease,أمراض الكلى,Kidney disease;Acute nephropathy;Impaired renal function disorder;Anuria
+diabetes,Diabetes,السكر,Diabetes mellitus;Diabetes mellitus type 2;Hyperglycemia
+high_bp,High blood pressure,ضغط مرتفع,Hypertensive disorder;Hypertensive urgency
+low_bp,Low blood pressure,ضغط منخفض,Low blood pressure;Orthostatic hypotension
+heart_failure,Heart failure,ضعف عضلة القلب,Chronic heart failure;Heart disease
+coronary,Heart attack or angina,جلطة في القلب أو ذبحة صدرية,Myocardial infarction;Myocardial infarction in recovery phase;Angina pectoris;Disorder of coronary artery;Myocardial ischemia
+heart_rhythm,Heart rhythm problem,اضطراب في ضربات القلب,Conduction disorder of the heart;Bradycardia;Prolonged QT interval;Congenital long QT syndrome;Complete atrioventricular block;Torsades de pointes
+stroke,Stroke,جلطة في المخ,Cerebrovascular accident
+epilepsy,Epilepsy or seizures,صرع أو تشنجات,Epilepsy;Seizure disorder
+asthma,Asthma,ربو (حساسية صدر),Asthma;Acute exacerbation of asthma
+copd,Chronic obstructive lung disease,السدة الرئوية المزمنة,Chronic obstructive lung disease;Pulmonary emphysema;Decreased respiratory function
+ulcer,Stomach or duodenal ulcer,قرحة في المعدة أو الاثنى عشر,Peptic ulcer;Gastric ulcer;Gastrointestinal ulcer;Gastrointestinal hemorrhage
+bowel,Ulcerative colitis or Crohn's disease,القولون التقرحي أو مرض كرون,Ulcerative colitis;Inflammatory bowel disease
+anemia,Anemia,أنيميا (فقر دم),Anemia
+bleeding,Bleeding or clotting disorder,مشكلة في سيولة أو تجلط الدم,Blood coagulation disorder;Thrombocytopenic disorder
+hyperthyroid,Overactive thyroid,زيادة نشاط الغدة الدرقية,Hyperthyroidism
+hypothyroid,Underactive thyroid,خمول الغدة الدرقية,Hypothyroidism
+glaucoma,Glaucoma,مياه زرقاء على العين (جلوكوما),Glaucoma;Angle-closure glaucoma;Open-angle glaucoma;Ocular hypertension
+prostate,Enlarged prostate or urine retention,تضخم البروستاتا أو احتباس البول,Benign prostatic hyperplasia;Retention of urine;Bladder outflow obstruction
+gout,Gout,النقرس,Gout;Hyperuricemia
+cholesterol,High cholesterol or blood fats,ارتفاع الكوليسترول أو الدهون,Hypercholesterolemia;Hyperlipidemia;Hypertriglyceridemia
+depression,Depression,اكتئاب,Depressive disorder;Suicidal thoughts
+myasthenia,Myasthenia gravis,الوهن العضلي الوبيل,Myasthenia gravis
+alcohol,Drinks alcohol,تعاطي الكحول,Alcoholism;Alcohol intoxication
+low_potassium,Low potassium,نقص البوتاسيوم,Hypokalemia
+high_potassium,High potassium,زيادة البوتاسيوم,Hyperkalemia
+osteoporosis,Osteoporosis,هشاشة العظام,Osteoporosis
+parkinson,Parkinson's disease,الشلل الرعاش (باركنسون),Parkinsonism
+lupus,Lupus,الذئبة الحمراء,Systemic lupus erythematosus
+kidney_stones,Kidney stones,حصوات الكلى,Kidney stone
+porphyria,Porphyria,البورفيريا,Porphyria

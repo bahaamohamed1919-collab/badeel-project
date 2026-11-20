@@ -6,7 +6,7 @@
 <p class="muted" dir="ltr">{{ user.email }}</p>
 <div class="two">
   <section>
-    <h2>{{ _('Profile and allergies', 'البيانات والحساسية') }}</h2>
+    <h2>{{ _('Profile, allergies and conditions', 'البيانات والحساسية والأمراض') }}</h2>
     <form method="post" class="form">
       {{ csrf() }}<input type="hidden" name="action" value="profile">
       <label>{{ _('Name', 'الاسم') }}
@@ -16,7 +16,16 @@
         <textarea name="allergies" rows="3" maxlength="500" dir="ltr" placeholder="Amoxicillin, Ibuprofen">{{ allergies }}</textarea>
         <small>{{ _('Scientific names in English, separated by commas. Stored encrypted. You get a warning on any product that contains one of them. Empty the box and save to delete them.', 'الأسماء العلمية بالإنجليزية مفصولة بفواصل. تُحفظ مشفرة. يظهر لك تحذير على أي دواء يحتوي إحداها. لمسحها فضّي الخانة واحفظ.') }}</small>
       </label>
-      <label class="radio"><input type="checkbox" name="consent" value="yes" {{ 'checked' if user.consent_at }}> {{ _('I agree that Badeel stores my allergy list (health data), encrypted, only to warn me. I can delete it at any time.', 'أوافق إن «بديل» يحفظ قائمة الحساسية بتاعتي (بيانات صحية) مشفرة، علشان يحذرني بس. وأقدر أمسحها في أي وقت.') }}</label>
+      <fieldset class="conditions">
+        <legend>{{ _('Conditions I have', 'أمراض أو حالات عندي') }}</legend>
+        <small>{{ _('You get a warning on any product that its source lists as not to be used with one of them. Untick all and save to delete them.', 'يظهر لك تحذير على أي دواء مكتوب في المصدر إنه ممنوع مع واحدة منها. لمسحها شيل كل العلامات واحفظ.') }}</small>
+        <div class="check-grid">
+          {% for g in groups %}
+          <label class="radio"><input type="checkbox" name="conditions" value="{{ g.key }}" {{ 'checked' if g.key in chosen }}> {{ _(g.en, g.ar) }}</label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <label class="radio"><input type="checkbox" name="consent" value="yes" {{ 'checked' if user.consent_at }}> {{ _('I agree that Badeel stores my allergies and conditions (health data), encrypted, only to warn me. I can delete them at any time.', 'أوافق إن «بديل» يحفظ الحساسية والأمراض بتاعتي (بيانات صحية) مشفرة، علشان يحذرني بس. وأقدر أمسحها في أي وقت.') }}</label>
       <button class="btn" type="submit">{{ _('Save profile', 'حفظ البيانات') }}</button>
     </form>
   </section>
