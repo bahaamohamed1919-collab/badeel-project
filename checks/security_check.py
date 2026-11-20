@@ -218,7 +218,10 @@ def enumeration(lab):
         start = time.perf_counter()
         r = lab.login(c, email, "wrong-password-1")
         elapsed = time.perf_counter() - start
+        # the per-session CSRF token differs on every session, not per e-mail: remove it
+        # from the form field and from the <meta> tag before comparing
         text = re.sub(r'name="csrf_token" value="[^"]+"', "", r.get_data(as_text=True))
+        text = re.sub(r'name="csrf-token" content="[^"]+"', "", text)
         text = re.sub(r'value="[^"]*@lab\.test"', "", text)
         return elapsed, text
     attempt("warmup@lab.test")
