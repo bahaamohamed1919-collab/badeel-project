@@ -92,6 +92,7 @@
 
 /* ------------------------------------------------------------ base */
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }   /* hidden always wins over a component's display */
 html { font-size: 100%; -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
@@ -502,3 +503,31 @@ a.stat:hover { border-color: var(--neon); box-shadow: var(--glow); color: inheri
   .search .tool { width: 3.2rem; height: 3.2rem; }
 }
 @media (prefers-reduced-motion: reduce) { .search .tool.listening { animation: none; } }
+
+/* ---------- medicine reminders */
+.head-actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.head-actions form { margin: 0; }
+.lead-name { font-size: 1.2rem; font-weight: 750; margin-bottom: 1rem; }
+.every-choices { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: .5rem; }
+.choice { display: flex !important; align-items: center; gap: .5rem; padding: .7rem .8rem; border: 1.5px solid var(--line-strong);
+          border-radius: var(--radius-sm); cursor: pointer; font-weight: 600 !important; }
+.choice:has(input:checked) { border-color: var(--neon); box-shadow: var(--glow); }
+.reminder-list { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; }
+.reminder { display: grid; gap: .6rem; padding: 1rem 1.1rem; border-radius: var(--radius); background: var(--surface);
+            border: 1px solid var(--line); box-shadow: var(--shadow); }
+.reminder.refill { border-color: var(--danger); background: var(--danger-bg); }
+.reminder.paused { opacity: .7; }
+.reminder-main { display: flex; justify-content: space-between; gap: .4rem 1rem; flex-wrap: wrap; align-items: baseline; }
+.reminder-facts { display: flex; gap: .5rem 1.2rem; flex-wrap: wrap; }
+.fact { display: inline-flex; align-items: center; gap: .4rem; }
+.fact .ic { color: var(--neon); width: 18px; height: 18px; }
+.fact.danger, .fact.danger .ic { color: var(--danger); font-weight: 700; }
+.refill-note { margin: 0; display: flex; gap: .5rem; align-items: center; flex-wrap: wrap; font-weight: 700; color: var(--danger); }
+.reminder-actions { display: flex; gap: .4rem; flex-wrap: wrap; }
+.reminder-actions form { margin: 0; }
+.reminder-actions .chip { cursor: pointer; font: inherit; font-size: .88rem; color: var(--ink); }
+.chip.danger { color: var(--danger); border-color: var(--danger); }
+.notify-bar { display: flex; gap: .6rem 1rem; align-items: center; flex-wrap: wrap; padding: .8rem 1rem; margin-bottom: .8rem;
+              border-radius: var(--radius); background: var(--surface); border: 1px dashed var(--line-strong); }
+.notify-text { flex: 1 1 18rem; }
+.js .notify-bar.needs-js:not([hidden]) { display: flex; }

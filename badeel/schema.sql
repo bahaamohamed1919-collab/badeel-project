@@ -151,3 +151,32 @@ CREATE TABLE IF NOT EXISTS ingredient_conditions (
     PRIMARY KEY (ingredient, condition, relation)
 );
 CREATE INDEX IF NOT EXISTS idx_conditions_condition ON ingredient_conditions (condition, relation);
+
+-- Medicine reminders: the patient's own schedule for a saved medicine.
+-- Times are UTC text, like every other time in this database.
+CREATE TABLE IF NOT EXISTS reminders (
+    id                  INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id             INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    drug_id             INTEGER NOT NULL REFERENCES drugs(id) ON DELETE CASCADE,
+    every_hours         INTEGER NOT NULL CHECK (every_hours IN (6, 8, 12, 24)),
+    first_dose_at       TEXT NOT NULL,
+    units_per_dose      REAL NOT NULL DEFAULT 1 CHECK (units_per_dose > 0 AND units_per_dose <= 10),
+    units_in_box        INTEGER CHECK (units_in_box IS NULL OR units_in_box > 0),
+    box_started_at      TEXT,
+    active              INTEGER NOT NULL DEFAULT 1,
+    last_dose_notified  TEXT,
+    refill_notified_at  TEXT,
+    created_at          TEXT NOT NULL,
+    UNIQUE (user_id, drug_id)
+);
+CREATE INDEX IF NOT EXISTS idx_reminders_active ON reminders (active);
+
+-- Browsers that may receive notifications (Web Push subscriptions).
+CREATE TABLE IF NOT EXISTS push_subscriptions (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    endpoint    TEXT NOT NULL UNIQUE,
+    p256dh      TEXT NOT NULL,
+    auth        TEXT NOT NULL,
+    created_at  TEXT NOT NULL
+);

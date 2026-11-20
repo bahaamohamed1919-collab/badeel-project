@@ -1,3 +1,4 @@
 Flask>=3.0
 scikit-learn>=1.4
 cryptography>=42
+pywebpush>=2.0   # medicine reminders (Web Push); the site works without it
