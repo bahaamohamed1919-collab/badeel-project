@@ -33,6 +33,56 @@ def _write(path, header, rows):
     return n
 
 
+def _read(path):
+    with open(path, encoding="utf-8", newline="") as f:
+        return list(csv.DictReader(f))
+
+
+def _none(value):
+    return value if value not in ("", None) else None
+
+
+def import_enrichment(data_dir):
+    """Load interactions, conditions and leaflets from a folder written by export().
+
+    Lets a server get the enriched data from the dataset/ folder of the
+    repository instead of downloading about 3 GB of raw sources.
+    """
+    counts = {}
+    rows = _read(os.path.join(data_dir, "interactions.csv"))
+    db.execute("DELETE FROM drug_interactions")
+    db.get_db().executemany(
+        "INSERT OR REPLACE INTO drug_interactions (ingredient_a, ingredient_b, severity, source) "
+        "VALUES (?, ?, ?, ?)",
+        [(r["ingredient_a"], r["ingredient_b"], r["severity"], r["source"]) for r in rows])
+    counts["interactions"] = len(rows)
+
+    rows = _read(os.path.join(data_dir, "conditions.csv"))
+    db.execute("DELETE FROM ingredient_conditions")
+    db.get_db().executemany(
+        "INSERT OR IGNORE INTO ingredient_conditions (ingredient, condition, relation, umls_cui, source) "
+        "VALUES (?, ?, ?, ?, ?)",
+        [(r["ingredient"], r["condition"], r["relation"], _none(r["umls_cui"]), r["source"]) for r in rows])
+    counts["conditions"] = len(rows)
+
+    rows = _read(os.path.join(data_dir, "leaflets.csv"))
+    cols = ["ingredient_key", "brand_name", "effective_date", "set_id", "label_id", "pediatric_note",
+            "min_age_months", "boxed_warning", "indications", "dosage", "contraindications",
+            "pediatric", "geriatric", "pregnancy", "lactation", "warnings"]
+    db.execute("DELETE FROM ingredient_labels")
+    db.get_db().executemany(
+        f"INSERT OR REPLACE INTO ingredient_labels (source, {', '.join(cols)}) "
+        f"VALUES ('openFDA', {', '.join('?' * len(cols))})",
+        [[(int(r[c]) if c == "min_age_months" and r[c] else _none(r[c])) for c in cols] for r in rows])
+    counts["leaflets"] = len(rows)
+
+    now = db.now()
+    for key in ("interactions_loaded", "conditions_loaded", "labels_loaded"):
+        db.set_setting(key, now + " (from dataset files)")
+    db.commit()
+    return counts
+
+
 def export(out_dir, groups_csv):
     os.makedirs(out_dir, exist_ok=True)
     counts = {}

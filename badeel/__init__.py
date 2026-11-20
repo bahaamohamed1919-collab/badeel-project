@@ -35,6 +35,15 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
 
+    # Behind a hosting proxy (PythonAnywhere, nginx ...) the visitor's address is
+    # in X-Forwarded-For; without this every visitor looks like the proxy, and
+    # the per-address login limit would lock everyone out together. Only set
+    # BADEEL_TRUST_PROXY=1 when such a proxy is really in front: otherwise
+    # anyone could fake the header.
+    if os.environ.get("BADEEL_TRUST_PROXY") == "1" or app.config.get("TRUST_PROXY"):
+        from werkzeug.middleware.proxy_fix import ProxyFix
+        app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1)
+
     app.teardown_appcontext(db.close_db)
     with app.app_context():
         db.init_db()
@@ -65,6 +74,7 @@ def create_app(test_config=None):
             "csrf_token": security.csrf_token, "money": money,
             "form_label": lambda f: form_label(f, g.get("lang", "ar")),
             "demo_data": db.get_setting("demo_data") == "1",
+            "public_notice": os.environ.get("BADEEL_PUBLIC_NOTICE") == "1" or app.config.get("PUBLIC_NOTICE"),
             "current_path": request.full_path.rstrip("?"),
         }
 
