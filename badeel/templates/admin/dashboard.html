@@ -1,17 +1,28 @@
 {% extends "base.html" %}
+{% from "_icons.html" import icon %}
 {% block title %}{{ _('Admin', 'لوحة التحكم') }}{% endblock %}
 {% block content %}
 {% include "admin/_nav.html" %}
-<h1 class="page-h">{{ _('Overview', 'نظرة عامة') }}</h1>
-<dl class="facts">
-  <div><dt>{{ _('Drugs', 'الأدوية') }}</dt><dd>{{ stats.drugs }}</dd></div>
-  <div><dt>{{ _('Active ingredients', 'المواد الفعالة') }}</dt><dd>{{ stats.ingredients }}</dd></div>
-  <div><dt>{{ _('Users', 'المستخدمون') }}</dt><dd>{{ stats.users }}</dd></div>
-  <div><dt>{{ _('In shortage', 'نواقص') }}</dt><dd>{{ stats.shortages }}</dd></div>
-  <div><dt>{{ _('Security events, last 24 h', 'أحداث أمنية آخر 24 ساعة') }}</dt><dd>{{ stats.events_24h }}</dd></div>
-</dl>
+<header class="dash-head">
+  <div>
+    <h1>{{ _('Admin dashboard', 'لوحة الأدمن') }}</h1>
+    <p>{{ _('The drug list, the users, the search model and the security log.', 'قائمة الأدوية والمستخدمين وموديل البحث وسجل الأمان.') }}</p>
+  </div>
+</header>
+<div class="stats">
+  <a class="stat" href="{{ url_for('admin.drugs') }}"><span class="stat-ic">{{ icon('pill') }}</span>
+    <span class="stat-label">{{ _('Drugs', 'الأدوية') }}</span><span class="stat-value">{{ stats.drugs }}</span></a>
+  <div class="stat violet"><span class="stat-ic">{{ icon('spark') }}</span>
+    <span class="stat-label">{{ _('Active ingredients', 'المواد الفعالة') }}</span><span class="stat-value">{{ stats.ingredients }}</span></div>
+  <a class="stat" href="{{ url_for('admin.users') }}"><span class="stat-ic">{{ icon('users') }}</span>
+    <span class="stat-label">{{ _('Users', 'المستخدمون') }}</span><span class="stat-value">{{ stats.users }}</span></a>
+  <a class="stat warn" href="{{ url_for('pharmacist.dashboard') }}"><span class="stat-ic">{{ icon('alert') }}</span>
+    <span class="stat-label">{{ _('In shortage', 'نواقص') }}</span><span class="stat-value">{{ stats.shortages }}</span></a>
+  <a class="stat bad" href="{{ url_for('admin.security_log') }}"><span class="stat-ic">{{ icon('shield') }}</span>
+    <span class="stat-label">{{ _('Security events, last 24 h', 'أحداث أمنية آخر 24 ساعة') }}</span><span class="stat-value">{{ stats.events_24h }}</span></a>
+</div>
 
-<h2>{{ _('Needs your attention', 'يحتاج انتباهك') }}</h2>
+<h2 class="section-title">{{ icon('info') }}{{ _('Needs your attention', 'يحتاج انتباهك') }}</h2>
 <ul class="todo">
   {% if stats.pending %}<li><a href="{{ url_for('admin.users') }}">{{ _('%s pharmacist account(s) waiting for approval', '%s حساب صيدلي في انتظار الموافقة') | format(stats.pending) }}</a></li>{% endif %}
   {% if stats.no_strength %}<li>{{ _('%s drug(s) have no strength recorded, so they can never be matched', '%s دواء بدون تركيز مسجل ولا يمكن مطابقته') | format(stats.no_strength) }}</li>{% endif %}

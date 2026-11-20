@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 {% from "_macros.html" import strip, search_box, drug_name, availability with context %}
+{% from "_icons.html" import icon %}
 {% block content %}
 <section class="hero">
-  <h1>{{ _('The medicine is out of stock. Which one is exactly the same?', 'الدواء ناقص. أي دواء آخر مطابق له تمامًا؟') }}</h1>
+  <span class="eyebrow">{{ icon('spark') }}{{ _('Same ingredient · same strength · same form', 'نفس المادة · نفس التركيز · نفس الشكل') }}</span>
+  <h1>{{ _('The medicine is out of stock.', 'الدواء ناقص؟') }} <span class="grad-text">{{ _('Which one is exactly the same?', 'لاقي البديل المطابق له تمامًا') }}</span></h1>
   <p class="lead">{{ _('Type the name on the box. Badeel lists every product with the same active ingredient, the same strength and the same form, cheapest first.', 'اكتب الاسم المكتوب على العلبة، وبديل يعرض لك كل الأدوية التي لها نفس المادة الفعالة ونفس التركيز ونفس الشكل، مرتبة من الأرخص.') }}</p>
   {{ search_box(autofocus=True) }}
   {% if stats.drugs %}
@@ -35,9 +37,9 @@
 <section class="who">
   <h2>{{ _('What you can do here', 'ماذا يمكنك أن تفعل هنا') }}</h2>
   <dl class="who-list">
-    <div><dt>{{ _('Patients', 'المريض') }}</dt><dd>{{ _('Find a cheaper or available match, save medicines you take regularly, and get a warning when a product contains something you are allergic to.', 'ابحث عن بديل متوفر أو أرخص، احفظ أدويتك الدائمة، واحصل على تحذير إذا كان الدواء يحتوي مادة عندك حساسية منها.') }}</dd></div>
-    <div><dt>{{ _('Pharmacists', 'الصيدلي') }}</dt><dd>{{ _('Mark a product as in shortage and update its price so everyone sees the current situation.', 'سجّل أن الدواء ناقص وحدّث سعره ليرى الجميع الوضع الحالي.') }}</dd></div>
-    <div><dt>{{ _('Admins', 'الأدمن') }}</dt><dd>{{ _('Upload the drug list, approve pharmacists, and watch the security log.', 'ارفع قائمة الأدوية، وافق على حسابات الصيادلة، وراقب سجل الأمان.') }}</dd></div>
+    <div><dt>{{ icon('heart') }}{{ _('Patients', 'المريض') }}</dt><dd>{{ _('Find a cheaper or available match, save medicines you take regularly, and get a warning when a product contains something you are allergic to.', 'ابحث عن بديل متوفر أو أرخص، احفظ أدويتك الدائمة، واحصل على تحذير إذا كان الدواء يحتوي مادة عندك حساسية منها.') }}</dd></div>
+    <div><dt>{{ icon('pill') }}{{ _('Pharmacists', 'الصيدلي') }}</dt><dd>{{ _('Mark a product as in shortage and update its price so everyone sees the current situation.', 'سجّل أن الدواء ناقص وحدّث سعره ليرى الجميع الوضع الحالي.') }}</dd></div>
+    <div><dt>{{ icon('shield') }}{{ _('Admins', 'الأدمن') }}</dt><dd>{{ _('Upload the drug list, approve pharmacists, and watch the security log.', 'ارفع قائمة الأدوية، وافق على حسابات الصيادلة، وراقب سجل الأمان.') }}</dd></div>
   </dl>
 </section>
 {% endblock %}

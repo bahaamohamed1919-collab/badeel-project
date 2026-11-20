@@ -1,51 +1,116 @@
+{% from "_icons.html" import icon %}
 <!doctype html>
 <html lang="{{ lang }}" dir="{{ 'rtl' if lang == 'ar' else 'ltr' }}">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
   <title>{% block title %}{{ _('Badeel', 'بديل') }}{% endblock %} | {{ _('Medication alternatives', 'بدائل الأدوية') }}</title>
   <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <script src="{{ url_for('static', filename='js/theme.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-<body>
+{%- set ep = request.endpoint or '' %}
+{%- set role = user.role if user else 'visitor' %}
+{%- if role == 'admin' %}{% set home_ep = 'admin.dashboard' %}
+{%- elif role == 'pharmacist' %}{% set home_ep = 'pharmacist.dashboard' %}
+{%- elif role == 'patient' %}{% set home_ep = 'account.dashboard' %}
+{%- else %}{% set home_ep = 'public.home' %}{% endif %}
+{%- macro navlink(endpoint, label, ic, also=()) -%}
+  {%- set here = request.endpoint or '' %}
+  <a class="nav-link" href="{{ url_for(endpoint) }}" {{ 'aria-current=page' if here == endpoint or here in also }}>{{ icon(ic) }}<span>{{ label }}</span></a>
+{%- endmacro %}
+<body class="role-{{ role }}">
+<div class="bg" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span><span class="grid"></span></div>
 <a class="skip" href="#main">{{ _('Skip to content', 'انتقل إلى المحتوى') }}</a>
+
 <header class="top">
-  <div class="wrap top-in">
-    <a class="brand" href="{{ url_for('public.home') }}">
-      <span class="brand-mark" aria-hidden="true"></span>
-      <span>{{ _('Badeel', 'بديل') }}</span>
+  <div class="top-in">
+    <a class="brand" href="{{ url_for(home_ep) }}" aria-label="{{ _('Badeel home', 'الصفحة الرئيسية لبديل') }}">
+      <span class="brand-icon">{{ icon('pill') }}</span>
+      <span class="brand-name">{{ _('Badeel', 'بديل') }}</span>
     </a>
-    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav">{{ _('Menu', 'القائمة') }}</button>
-    <nav id="nav" class="nav" aria-label="{{ _('Main', 'الرئيسية') }}">
-      <a href="{{ url_for('public.home') }}">{{ _('Search', 'بحث') }}</a>
-      {% if user %}
-        <a href="{{ url_for('account.favorites') }}">{{ _('Saved', 'المحفوظات') }}</a>
-        <a href="{{ url_for('account.history') }}">{{ _('History', 'السجل') }}</a>
-        {% if user.role in ('pharmacist', 'admin') %}
-          <a href="{{ url_for('pharmacist.dashboard') }}">{{ _('Shortages', 'النواقص') }}</a>
-        {% endif %}
-        {% if user.role == 'admin' %}
-          <a href="{{ url_for('admin.dashboard') }}">{{ _('Admin panel', 'لوحة التحكم') }}</a>
-        {% endif %}
-        <a href="{{ url_for('account.profile') }}">{{ user.name }}</a>
-        <form method="post" action="{{ url_for('auth.logout') }}">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button class="linklike" type="submit">{{ _('Log out', 'خروج') }}</button>
-        </form>
+
+    <nav class="nav" aria-label="{{ _('Main', 'الرئيسية') }}">
+      {% if role == 'visitor' %}
+        {{ navlink('public.home', _('Search', 'بحث'), 'search', ('public.search', 'public.drug')) }}
+        {{ navlink('public.about', _('How it works', 'كيف يعمل'), 'info') }}
       {% else %}
-        <a href="{{ url_for('public.about') }}">{{ _('How it works', 'كيف يعمل') }}</a>
-        <a href="{{ url_for('auth.login') }}">{{ _('Log in', 'دخول') }}</a>
-        <a class="nav-cta" href="{{ url_for('auth.register') }}">{{ _('Create account', 'حساب جديد') }}</a>
+        {{ navlink(home_ep, _('Dashboard', 'لوحتي'), 'grid') }}
+        {{ navlink('public.home', _('Search', 'بحث'), 'search', ('public.search', 'public.drug')) }}
+        {% if role == 'admin' %}
+          {{ navlink('admin.drugs', _('Drugs', 'الأدوية'), 'box', ('admin.drug_new', 'admin.drug_edit')) }}
+          {{ navlink('admin.users', _('Users', 'المستخدمون'), 'users') }}
+        {% else %}
+          {{ navlink('account.favorites', _('Saved', 'المحفوظات'), 'heart') }}
+        {% endif %}
       {% endif %}
-      <a class="lang" href="{{ url_for('public.set_lang', code='en' if lang == 'ar' else 'ar', next=current_path) }}">{{ 'English' if lang == 'ar' else 'العربية' }}</a>
+      <details class="dropdown more">
+        <summary class="nav-link">{{ _('More', 'المزيد') }} {{ icon('chevron', 'chev') }}</summary>
+        <div class="menu">
+          {% if role == 'admin' %}
+            <a href="{{ url_for('admin.import_data') }}">{{ icon('upload') }}{{ _('Import data', 'استيراد البيانات') }}</a>
+            <a href="{{ url_for('admin.security_log') }}">{{ icon('shield') }}{{ _('Security log', 'سجل الأمان') }}</a>
+            <a href="{{ url_for('admin.audit_log') }}">{{ icon('log') }}{{ _('Change log', 'سجل التغييرات') }}</a>
+            <a href="{{ url_for('pharmacist.dashboard') }}">{{ icon('alert') }}{{ _('Shortages', 'النواقص') }}</a>
+            <a href="{{ url_for('account.favorites') }}">{{ icon('heart') }}{{ _('Saved', 'المحفوظات') }}</a>
+          {% endif %}
+          {% if user %}
+            <a href="{{ url_for('account.history') }}">{{ icon('clock') }}{{ _('Search history', 'سجل البحث') }}</a>
+            <a href="{{ url_for('account.profile') }}">{{ icon('user') }}{{ _('Health profile and account', 'ملفي الصحي والحساب') }}</a>
+          {% endif %}
+          <a href="{{ url_for('public.about') }}">{{ icon('info') }}{{ _('How matching works', 'كيف تتم المطابقة') }}</a>
+        </div>
+      </details>
     </nav>
+
+    <div class="actions">
+      {% if role == 'visitor' %}
+        <a class="btn ghost" href="{{ url_for('auth.login') }}">{{ _('Log in', 'دخول') }}</a>
+        <a class="btn" href="{{ url_for('auth.register') }}">{{ icon('spark') }}<span>{{ _('Create account', 'حساب جديد') }}</span></a>
+      {% elif role == 'admin' %}
+        <a class="btn ghost hide-sm" href="{{ url_for('admin.drug_new') }}">{{ icon('plus') }}<span>{{ _('Add drug', 'إضافة دواء') }}</span></a>
+        <a class="btn hide-sm" href="{{ url_for('admin.import_data') }}">{{ icon('upload') }}<span>{{ _('Import data', 'استيراد') }}</span></a>
+      {% elif role == 'pharmacist' %}
+        <a class="btn ghost hide-sm" href="{{ url_for('public.home') }}">{{ icon('edit') }}<span>{{ _('Update a product', 'تحديث دواء') }}</span></a>
+        <a class="btn hide-sm" href="{{ url_for('pharmacist.dashboard') }}">{{ icon('alert') }}<span>{{ _('Shortages', 'النواقص') }}</span></a>
+      {% else %}
+        <a class="btn ghost hide-sm" href="{{ url_for('account.profile') }}">{{ icon('heart') }}<span>{{ _('Health profile', 'ملفي الصحي') }}</span></a>
+        <a class="btn hide-sm" href="{{ url_for('public.home') }}">{{ icon('search') }}<span>{{ _('Find alternatives', 'ابحث عن بديل') }}</span></a>
+      {% endif %}
+
+      <a class="circle" href="{{ url_for('public.search') }}" title="{{ _('Search', 'بحث') }}" aria-label="{{ _('Search', 'بحث') }}">{{ icon('search') }}</a>
+      <a class="circle lang" href="{{ url_for('public.set_lang', code='en' if lang == 'ar' else 'ar', next=current_path) }}"
+         title="{{ 'English' if lang == 'ar' else 'العربية' }}" lang="{{ 'en' if lang == 'ar' else 'ar' }}">{{ 'EN' if lang == 'ar' else 'ع' }}</a>
+      <button class="circle theme-toggle" type="button" title="{{ _('Light or dark mode', 'الوضع الفاتح أو الداكن') }}"
+              aria-label="{{ _('Switch between light and dark mode', 'التبديل بين الوضع الفاتح والداكن') }}">
+        {{ icon('sun', 'sun') }}{{ icon('moon', 'moon') }}
+      </button>
+
+      {% if user %}
+      <details class="dropdown account">
+        <summary class="avatar" aria-label="{{ _('Account menu', 'قائمة الحساب') }}">{{ (user.name or '?')[:1] | upper }}</summary>
+        <div class="menu end">
+          <div class="menu-head">
+            <strong>{{ user.name }}</strong>
+            <span class="role-pill role-{{ role }}">{{ {'admin': _('Admin', 'أدمن'), 'pharmacist': _('Pharmacist', 'صيدلي'), 'patient': _('Patient', 'مريض')}[role] }}</span>
+            <small dir="ltr">{{ user.email }}</small>
+          </div>
+          <a href="{{ url_for(home_ep) }}">{{ icon('grid') }}{{ _('My dashboard', 'لوحتي') }}</a>
+          <a href="{{ url_for('account.profile') }}">{{ icon('user') }}{{ _('Health profile and account', 'ملفي الصحي والحساب') }}</a>
+          <form method="post" action="{{ url_for('auth.logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button class="menu-btn danger" type="submit">{{ icon('logout') }}{{ _('Log out', 'خروج') }}</button>
+          </form>
+        </div>
+      </details>
+      {% endif %}
+    </div>
   </div>
 </header>
 
 {% if demo_data %}
-<div class="demo-bar">
-  <div class="wrap">{{ _('Demo data: names are real but prices and availability are placeholders. Do not use for real decisions.', 'بيانات تجريبية: الأسماء حقيقية لكن الأسعار والتوافر أرقام للتجربة فقط. لا تعتمد عليها.') }}</div>
-</div>
+<div class="demo-bar"><div class="wrap">{{ icon('info') }} {{ _('Demo data: names are real but prices and availability are placeholders. Do not use for real decisions.', 'بيانات تجريبية: الأسماء حقيقية لكن الأسعار والتوافر أرقام للتجربة فقط. لا تعتمد عليها.') }}</div></div>
 {% endif %}
 
 <main id="main" class="wrap main">
@@ -58,7 +123,8 @@
 </main>
 
 <footer class="foot">
-  <div class="wrap">
+  <div class="wrap foot-in">
+    <span class="brand small"><span class="brand-icon">{{ icon('pill') }}</span>{{ _('Badeel', 'بديل') }}</span>
     <p>{{ _('Badeel helps you find options. It does not replace your pharmacist or doctor: confirm any change of medicine with one of them.', 'بديل يساعدك في معرفة الاختيارات ولا يغني عن الصيدلي أو الطبيب. راجع أحدهما قبل تغيير أي دواء.') }}</p>
     <p><a href="{{ url_for('public.about') }}">{{ _('How matching works', 'كيف تتم المطابقة') }}</a></p>
   </div>
