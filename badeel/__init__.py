@@ -84,8 +84,8 @@ def create_app(test_config=None):
             "current_path": request.full_path.rstrip("?"),
         }
 
-    from .routes import account, admin, auth, pharmacist, public, trap
-    for module in (public, auth, account, pharmacist, admin, trap):
+    from .routes import account, admin, auth, pharmacist, public, reminders, trap
+    for module in (public, auth, account, pharmacist, admin, reminders, trap):
         app.register_blueprint(module.bp)
 
     def error_page(code, en, ar):

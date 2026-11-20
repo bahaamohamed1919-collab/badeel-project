@@ -2,7 +2,7 @@
 from flask import Blueprint, abort, flash, g, redirect, render_template, request, url_for
 
 from .. import db, security
-from ..services import conditions, interactions
+from ..services import conditions, interactions, reminders
 
 bp = Blueprint("account", __name__)
 
@@ -35,7 +35,8 @@ def dashboard():
     return render_template(
         "account/dashboard.html", saved=saved, recent=recent, groups=[conditions.GROUPS[k] for k in groups],
         allergy_count=len(allergies), pair_warnings=pair_warnings,
-        condition_warnings=condition_warnings, severity_labels=interactions.SEVERITY_LABELS)
+        condition_warnings=condition_warnings, severity_labels=interactions.SEVERITY_LABELS,
+        reminders=reminders.summary(g.user["id"]), push_ready=reminders.push_available())
 
 
 @bp.route("/account", methods=["GET", "POST"])

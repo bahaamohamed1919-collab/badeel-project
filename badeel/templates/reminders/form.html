@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_macros.html" import csrf, drug_name with context %}
+{% from "_icons.html" import icon %}
+{% block title %}{{ _('Remind me', 'فكرني بميعاده') }}{% endblock %}
+{% block content %}
+<section class="form-page reminder-form">
+  <h1 class="page-h">{{ icon('clock') }} {{ _('Remind me to take it', 'فكرني بميعاده') }}</h1>
+  <p class="lead-name">{{ drug_name(drug) }}</p>
+  <div class="alert warn">{{ _('Use the dose your doctor or pharmacist gave you. Badeel only reminds you; it never chooses a dose.', 'استخدم الجرعة اللي الطبيب أو الصيدلي قالهالك. بديل بيفكّرك بس، ومش بيحدد جرعات.') }}</div>
+  <form method="post" class="form">
+    {{ csrf() }}
+    {% set every = (form.get('every_hours') or (current.every_hours if current else 8)) | int %}
+    <fieldset>
+      <legend>{{ _('How often?', 'كل قد إيه؟') }}</legend>
+      <div class="every-choices">
+        {% for h in [6, 8, 12, 24] %}
+        <label class="choice"><input type="radio" name="every_hours" value="{{ h }}" {{ 'checked' if every == h }}>
+          <span>{{ _('Every %s hours', 'كل %s ساعات') | format(h) if h < 24 else _('Once a day', 'مرة في اليوم') }}</span></label>
+        {% endfor %}
+      </div>
+    </fieldset>
+    <label>{{ _('Time of the first dose (Egypt time)', 'ميعاد أول جرعة (بتوقيت مصر)') }}
+      <input type="time" name="first_time" required value="{{ first_value }}">
+      <small>{{ _('The next doses follow from it: for every 8 hours from 08:00, also 16:00 and 00:00.', 'الجرعات اللي بعدها بتتحسب منه: لو كل 8 ساعات من 08:00 يبقى كمان 16:00 و 00:00.') }}</small>
+    </label>
+    <label>{{ _('Units per dose (tablets, capsules, sachets...)', 'عدد الوحدات في الجرعة (قرص، كبسولة، كيس...)') }}
+      <input type="number" name="units_per_dose" min="0.5" max="10" step="0.5" required
+             value="{{ form.get('units_per_dose') or (current.units_per_dose if current else 1) }}">
+    </label>
+    <label>{{ _('Units in the box', 'عدد الوحدات في العلبة') }}
+      <input type="number" name="units_in_box" min="1" max="1000" step="1"
+             value="{{ form.get('units_in_box') or (current.units_in_box if current else (drug.pack_count or '')) }}">
+      <small>{{ _('Filled in from the box name when known. With it, Badeel warns you %s days before the box runs out.', 'بيتملى لوحده من اسم العلبة لما يكون معروف. بيه، بديل بيفكّرك قبل ما العلبة تخلص بـ %s يوم.') | format(2) }}</small>
+    </label>
+    {% if not user.consent_at %}
+    <label class="radio"><input type="checkbox" name="consent" value="yes"> {{ _('I agree that Badeel stores my medicine times (health data) only to remind me. I can delete them at any time.', 'أوافق إن بديل يحفظ مواعيد أدويتي (بيانات صحية) علشان يفكّرني بس. وأقدر أمسحها في أي وقت.') }}</label>
+    {% endif %}
+    <div class="form-actions">
+      <button class="btn" type="submit">{{ icon('clock') }}<span>{{ _('Save reminder', 'احفظ التذكير') }}</span></button>
+      <a class="btn ghost" href="{{ url_for('public.drug', drug_id=drug.id) }}">{{ _('Back', 'رجوع') }}</a>
+    </div>
+  </form>
+</section>
+{% endblock %}

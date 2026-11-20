@@ -31,6 +31,54 @@
   </a>
 </div>
 
+<section id="reminders" aria-labelledby="h-rem">
+  <h2 class="section-title" id="h-rem">{{ icon('clock') }}{{ _('My medicine times', 'مواعيد أدويتي') }}</h2>
+  {% if reminders %}
+  <div class="notify-bar needs-js" data-push-ready="{{ '1' if push_ready else '0' }}" hidden>
+    <span class="notify-text">{{ _('Get a notification on this device when it is time for a dose and before a box runs out.', 'يوصلك إشعار على الجهاز ده في ميعاد الجرعة وقبل ما العلبة تخلص.') }}</span>
+    <button class="btn" type="button" data-push-on>{{ _('Turn on notifications', 'فعّل الإشعارات') }}</button>
+    <button class="btn ghost" type="button" data-push-off hidden>{{ _('Turn off notifications', 'وقّف الإشعارات') }}</button>
+    <span class="notify-state muted" role="status"
+          data-on="{{ _('Notifications are on for this device.', 'الإشعارات شغالة على الجهاز ده.') }}"
+          data-denied="{{ _('Notifications are blocked in the browser settings.', 'الإشعارات مقفولة من إعدادات المتصفح.') }}"
+          data-unsupported="{{ _('This browser cannot receive notifications. On iPhone, add Badeel to the home screen first.', 'المتصفح ده مش بيستقبل إشعارات. على الآيفون، ضيف بديل للشاشة الرئيسية الأول.') }}"></span>
+  </div>
+  <ul class="reminder-list">
+    {% for item in reminders %}{% set r = item.r %}{% set box = item.box %}
+    <li class="reminder {{ 'refill' if box and box.refill_due }} {{ 'paused' if not r.active }}">
+      <div class="reminder-main">
+        <a class="row-name" href="{{ url_for('public.drug', drug_id=r.drug_id) }}">{{ r.trade_name_ar if lang == 'ar' and r.trade_name_ar else r.trade_name }}</a>
+        <span class="muted">{{ _('Every %s hours', 'كل %s ساعات') | format(r.every_hours) if r.every_hours < 24 else _('Once a day', 'مرة في اليوم') }} · {{ _('%s per dose', '%s في الجرعة') | format(r.units_per_dose | round(1) | string | replace('.0', '')) }}</span>
+      </div>
+      <div class="reminder-facts">
+        {% if r.active %}
+        <span class="fact" data-next-dose="{{ item.next.isoformat() }}" data-name="{{ r.trade_name_ar if lang == 'ar' and r.trade_name_ar else r.trade_name }}">{{ icon('clock') }}{{ _('Next dose:', 'الجرعة الجاية:') }} <strong>{{ item.next | local_time }}</strong></span>
+        {% else %}<span class="fact muted">{{ _('Paused', 'متوقف') }}</span>{% endif %}
+        {% if box %}
+        <span class="fact {{ 'danger' if box.refill_due }}">{{ icon('box') }}{{ _('About %s left: lasts %s day(s)', 'فاضل حوالي %s: تكفي %s يوم') | format(box.units_left | round(0) | int, box.days_left | round(1) | string | replace('.0', '')) }}</span>
+        {% else %}<span class="fact muted">{{ _('Add the box size to get a refill warning.', 'ضيف عدد الوحدات في العلبة علشان يفكّرك قبل ما تخلص.') }}</span>{% endif %}
+      </div>
+      {% if box and box.refill_due %}
+      <p class="refill-note">{{ icon('alert') }}{{ _('Buy a new box soon.', 'اشتري علبة جديدة قريب.') }}
+        {% if r.availability == 'shortage' %}<a href="{{ url_for('public.drug', drug_id=r.drug_id) }}">{{ _('This medicine is in shortage: see the alternatives', 'الدواء ده ناقص: شوف البدايل') }}</a>{% endif %}</p>
+      {% endif %}
+      <div class="reminder-actions">
+        <form method="post" action="{{ url_for('reminders.new_box', reminder_id=r.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="chip" type="submit">{{ _('I opened a new box', 'فتحت علبة جديدة') }}</button></form>
+        <a class="chip" href="{{ url_for('reminders.edit', drug_id=r.drug_id) }}">{{ _('Change', 'تعديل') }}</a>
+        <form method="post" action="{{ url_for('reminders.toggle', reminder_id=r.id) }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="chip" type="submit">{{ _('Pause', 'وقّف مؤقتًا') if r.active else _('Resume', 'كمّل') }}</button></form>
+        <form method="post" action="{{ url_for('reminders.delete', reminder_id=r.id) }}" data-confirm="{{ _('Delete this reminder?', 'تمسح التذكير ده؟') }}"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="chip danger" type="submit">{{ _('Delete', 'مسح') }}</button></form>
+      </div>
+    </li>
+    {% endfor %}
+  </ul>
+  {% elif saved %}
+  <p class="none">{{ _('Open one of your medicines and press “Remind me to take it”.', 'افتح أي دواء من أدويتك واضغط «فكرني بميعاده».') }}
+    {% for d in saved[:3] %}<a class="chip" href="{{ url_for('reminders.edit', drug_id=d.id) }}">{{ d.trade_name_ar if lang == 'ar' and d.trade_name_ar else d.trade_name }}</a>{% endfor %}</p>
+  {% else %}
+  <p class="none">{{ _('Save a medicine, then press “Remind me to take it” on its page.', 'احفظ دواء، وبعدين اضغط «فكرني بميعاده» في صفحته.') }}</p>
+  {% endif %}
+</section>
+
 <section id="warnings" aria-labelledby="h-warn">
   <h2 class="section-title" id="h-warn">{{ icon('alert') }}{{ _('Warnings about your saved medicines', 'تحذيرات على أدويتك المحفوظة') }}</h2>
   {% if pair_warnings or condition_warnings %}

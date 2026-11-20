@@ -19,6 +19,8 @@
     python manage.py export-dataset DIR   write the enriched data as CSV files
     python manage.py import-enrichment DIR   load interactions, conditions and leaflets from those files
     python manage.py install-model FILE   use a search model trained elsewhere (search_model.json)
+    python manage.py send-reminders       send medicine reminders that are due (run every 5 minutes)
+    python manage.py send-reminders --loop 300    keep running, checking every 300 seconds
 """
 import argparse
 import getpass
@@ -29,7 +31,7 @@ import sys
 from flask import current_app
 
 from badeel import create_app, db, security
-from badeel.services import conditions, coverage, export, importer, interactions, labels, ranker, search, sources
+from badeel.services import conditions, coverage, export, importer, reminders, interactions, labels, ranker, search, sources
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -279,6 +281,18 @@ def cmd_install_model(args):
     print(f"Search model installed ({data.get('drugs', '?')} drugs, trained {data.get('trained_at', '?')}).")
 
 
+def cmd_send_reminders(args):
+    import time
+    if not reminders.push_available():
+        sys.exit("pywebpush is not installed: pip install -r requirements.txt")
+    contact = os.environ.get("BADEEL_PUSH_CONTACT", "mailto:admin@badeel.invalid")
+    while True:
+        reminders.send_due(contact=contact)
+        if not args.loop:
+            break
+        time.sleep(max(60, args.loop))
+
+
 def cmd_export_dataset(args):
     counts = export.export(args.dir, os.path.join(ROOT, "data", "patient_conditions.csv"))
     for name, n in counts.items():
@@ -321,6 +335,9 @@ def main():
     p = sub.add_parser("load-conditions")
     p.add_argument("files", nargs="+")
     p.set_defaults(func=cmd_load_conditions)
+    p = sub.add_parser("send-reminders")
+    p.add_argument("--loop", type=int, default=0)
+    p.set_defaults(func=cmd_send_reminders)
     p = sub.add_parser("import-enrichment")
     p.add_argument("dir")
     p.set_defaults(func=cmd_import_enrichment)

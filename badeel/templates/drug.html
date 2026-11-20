@@ -15,10 +15,13 @@
       </p>
     </div>
     {% if user %}
+    <div class="head-actions">
     <form method="post" action="{{ url_for('account.toggle_favorite', drug_id=d.id) }}">
       {{ csrf() }}
       <button class="btn ghost" type="submit">{{ _('Remove from saved', 'إزالة من المحفوظات') if is_favorite else _('Save this medicine', 'حفظ هذا الدواء') }}</button>
     </form>
+    <a class="btn" href="{{ url_for('reminders.edit', drug_id=d.id) }}">{{ _('Remind me to take it', 'فكرني بميعاده') }}</a>
+    </div>
     {% endif %}
   </header>
 
